@@ -23,41 +23,41 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
     }
 
     @Override
-    protected String description(Input in) {
-        return "Keeps the directory " + in.local.toString() + " in sync with " + in.remote;
+    protected String description(Input input) {
+        return "Keeps the directory " + input.local.toString() + " in sync with " + input.remote;
     }
 
     @Override
-    protected File persistentPath(Input in) {
-        if (in.summaryLocation != null) {
-            return new File(in.summaryLocation, "git.dep");
+    protected File persistentPath(Input input) {
+        if (input.summaryLocation != null) {
+            return new File(input.summaryLocation, "git.dep");
         }
         return new File("./git.dep");
     }
 
     @Override
-    protected None build(Input in) throws Throwable {
+    protected None build(Input input) throws Throwable {
         //TODO: think I don't need to require any files
-        if (!localExists(in) || localIsEmpty(in)) {
-            if (isRemoteAccessible(in)) {
-                cloneRepository(in);
+        if (!localExists(input) || localIsEmpty(input)) {
+            if (isRemoteAccessible(input)) {
+                cloneRepository(input);
             } else {
-                throw new TransportException(in.remote + " can not be accessed");
+                throw new TransportException(input.remote + " can not be accessed");
             }
         } else {
-            if (isLocalRepo(in)) {
-                if (isRemoteAccessible(in) && isRemoteSet(in)) {
-                    pullRepository(in);
+            if (isLocalRepo(input)) {
+                if (isRemoteAccessible(input) && isRemoteSet(input)) {
+                    pullRepository(input);
                 } else {
                     //do nothing
                 }
             } else {
-                throw new IllegalArgumentException(in.local.toString() + " is not empty and does contains other data than the repository");
+                throw new IllegalArgumentException(input.local.toString() + " is not empty and does contains other data than the repository");
             }
         }
 
         //TODO: maybe only provide files not ignored by .gitignore
-        List<Path> outputFiles = FileCommands.listFilesRecursive(in.local.toPath());
+        List<Path> outputFiles = FileCommands.listFilesRecursive(input.local.toPath());
         for (Path p : outputFiles) {
             if (!p.toAbsolutePath().toString().contains(".git")) {
                 provide(p.toFile());
@@ -66,17 +66,17 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         return None.val;
     }
 
-    public boolean localExists(Input in) {
-        return FileCommands.exists(in.local);
+    public boolean localExists(Input input) {
+        return FileCommands.exists(input.local);
     }
 
-    public boolean localIsEmpty(Input in) {
-        return FileCommands.listFilesRecursive(in.local.toPath()).size() == 0;
+    public boolean localIsEmpty(Input input) {
+        return FileCommands.listFilesRecursive(input.local.toPath()).size() == 0;
     }
 
-    public boolean isRemoteAccessible(Input in) {
+    public boolean isRemoteAccessible(Input input) {
         try {
-            Git.lsRemoteRepository().setRemote(in.remote).call();
+            Git.lsRemoteRepository().setRemote(input.remote).call();
         } catch (InvalidRemoteException e) {
             return false;
         } catch (TransportException e) {
@@ -87,12 +87,12 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         return true;
     }
 
-    public void cloneRepository(Input in) {
+    public void cloneRepository(Input input) {
         try {
             Git result = Git.cloneRepository()
-                    .setURI(in.remote)
-                    .setDirectory(in.local)
-                    .setBranch(in.branchName)
+                    .setURI(input.remote)
+                    .setDirectory(input.local)
+                    .setBranch(input.branchName)
                     .call();
         } catch (InvalidRemoteException e) {
             System.out.println("INVALID REPO");
@@ -104,9 +104,9 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         }
     }
 
-    public boolean isLocalRepo(Input in) {
+    public boolean isLocalRepo(Input input) {
         try {
-            Git.open(in.local);
+            Git.open(input.local);
         } catch (IOException e) {
             return false;
         }
@@ -130,19 +130,19 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         }
     }
 
-    public void pullRepository(Input in) {
+    public void pullRepository(Input input) {
         try {
-            Git g = Git.open(in.local);
+            Git g = Git.open(input.local);
 
             FetchCommand fetch = g.fetch();
             FetchResult fetchResult = fetch.call();
 
             MergeCommand merge = g.merge();
             merge.include(fetchResult.getAdvertisedRef("HEAD"));
-            merge.setCommit(in.createMergeCommit);
-            merge.setSquash(in.squashCommit);
-            merge.setFastForward(in.ffMode);
-            merge.setStrategy(in.mergeStrategy);
+            merge.setCommit(input.createMergeCommit);
+            merge.setSquash(input.squashCommit);
+            merge.setFastForward(input.ffMode);
+            merge.setStrategy(input.mergeStrategy);
             MergeResult mergeResult = merge.call();
         } catch (GitAPIException e) {
             System.out.println("GIT FAILURE");
