@@ -5,7 +5,9 @@ import build.pluto.output.None;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
+import org.eclipse.jgit.api.errors.NotMergedException;
 import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.FetchResult;
 import org.sugarj.common.FileCommands;
@@ -130,24 +132,50 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         }
     }
 
-    public void pullRepository(Input input) {
+    public void pullRepository(Input input) throws NotMergedException {
+        FetchResult fetchResult = fetch(input);
+        if (fetchResult != null) {
+            MergeResult mergeResult = merge(input, fetchResult.getAdvertisedRef("HEAD"));
+            if (mergeResult != null) {
+                if (mergeResult.getMergeStatus().isSuccessful()) {
+                    return;
+                }
+            }
+        }
+        throw new NotMergedException();
+    }
+
+    public FetchResult fetch(Input input) {
         try {
             Git g = Git.open(input.local);
-
             FetchCommand fetch = g.fetch();
-            FetchResult fetchResult = fetch.call();
-
-            MergeCommand merge = g.merge();
-            merge.include(fetchResult.getAdvertisedRef("HEAD"));
-            merge.setCommit(input.createMergeCommit);
-            merge.setSquash(input.squashCommit);
-            merge.setFastForward(input.ffMode);
-            merge.setStrategy(input.mergeStrategy);
-            MergeResult mergeResult = merge.call();
-        } catch (GitAPIException e) {
-            System.out.println("GIT FAILURE");
-        } catch (IOException e) {
-            System.out.println("IO FAILURE");
+            return fetch.call();
+        } catch (GitAPIException e1) {
+            e1.printStackTrace();
+        } catch (IOException e1) {
+            e1.printStackTrace();
         }
+        return null;
+    }
+
+    public MergeResult merge(Input input, Ref ref) {
+        Git g = null;
+        try {
+            g = Git.open(input.local);
+        } catch (IOException e1) {
+            return null;
+        }
+        MergeCommand merge = g.merge();
+        merge.include(ref);
+        merge.setCommit(input.createMergeCommit);
+        merge.setSquash(input.squashCommit);
+        merge.setFastForward(input.ffMode);
+        merge.setStrategy(input.mergeStrategy);
+        try {
+            return merge.call();
+        } catch (GitAPIException e1) {
+            e1.printStackTrace();
+        }
+        return null;
     }
 }
