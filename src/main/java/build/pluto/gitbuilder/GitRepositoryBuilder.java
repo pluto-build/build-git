@@ -42,7 +42,7 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
             if (isRemoteLocationAccessible(in)) {
                 cloneRepository(in);
             } else {
-                throw new TransportException("Remote can not be accessed");
+                throw new TransportException(in.remoteLocation + " can not be accessed");
             }
         } else {
             if (isLocalLocationRepo(in)) {
@@ -52,7 +52,7 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
                     //do nothing
                 }
             } else {
-                throw new IllegalArgumentException("Local Location is not empty and does contains other data than the repository");
+                throw new IllegalArgumentException(in.localLocation.toString() + " is not empty and does contains other data than the repository");
             }
         }
 
