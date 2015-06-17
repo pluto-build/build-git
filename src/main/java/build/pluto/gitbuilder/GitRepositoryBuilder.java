@@ -74,6 +74,36 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         return FileCommands.listFilesRecursive(in.local.toPath()).size() == 0;
     }
 
+    public boolean isRemoteAccessible(Input in) {
+        try {
+            Git.lsRemoteRepository().setRemote(in.remote).call();
+        } catch (InvalidRemoteException e) {
+            return false;
+        } catch (TransportException e) {
+            return false;
+        } catch (GitAPIException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    public void cloneRepository(Input in) {
+        try {
+            Git result = Git.cloneRepository()
+                    .setURI(in.remote)
+                    .setDirectory(in.local)
+                    .setBranch(in.branchName)
+                    .call();
+        } catch (InvalidRemoteException e) {
+            System.out.println("INVALID REPO");
+        } catch (TransportException e) {
+            System.out.println("TRANSPORT FAILURE");
+//            throw e;
+        } catch (GitAPIException e) {
+            System.out.println("GIT FAILURE");
+        }
+    }
+
     public boolean isLocalRepo(Input in) {
         try {
             Git.open(in.local);
@@ -100,19 +130,6 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         }
     }
 
-    public boolean isRemoteAccessible(Input in) {
-        try {
-            Git.lsRemoteRepository().setRemote(in.remote).call();
-        } catch (InvalidRemoteException e) {
-            return false;
-        } catch (TransportException e) {
-            return false;
-        } catch (GitAPIException e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
-
     public void pullRepository(Input in) {
         try {
             Git g = Git.open(in.local);
@@ -131,23 +148,6 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
             System.out.println("GIT FAILURE");
         } catch (IOException e) {
             System.out.println("IO FAILURE");
-        }
-    }
-
-    public void cloneRepository(Input in) {
-        try {
-            Git result = Git.cloneRepository()
-                    .setURI(in.remote)
-                    .setDirectory(in.local)
-                    .setBranch(in.branchName)
-                    .call();
-        } catch (InvalidRemoteException e) {
-            System.out.println("INVALID REPO");
-        } catch (TransportException e) {
-            System.out.println("TRANSPORT FAILURE");
-//            throw e;
-        } catch (GitAPIException e) {
-            System.out.println("GIT FAILURE");
         }
     }
 }
