@@ -44,6 +44,36 @@ public class GitRepositoryBuilderTest {
     }
 
     @Test
+    public void checkIsLocalLocationEmpty() {
+        Input in = this.createInput("test7", null, null);
+        GitRepositoryBuilder b = new GitRepositoryBuilder(in);
+        try {
+            FileCommands.createDir(in.localLocation.toPath());
+            assertTrue(b.localLocationIsEmpty(in));
+        } catch (IOException e) {
+            fail("Could not create directory");
+        } finally {
+            deleteTempDir(in.localLocation);
+        }
+    }
+
+    @Test
+    public void checkIsLocalLocationNotEmpty() {
+        Input in = this.createInput("test8", null, null);
+        GitRepositoryBuilder b = new GitRepositoryBuilder(in);
+        try {
+            FileCommands.createDir(in.localLocation.toPath());
+            File file = new File(in.localLocation, "test.txt");
+            FileCommands.createFile(file);
+            assertFalse(b.localLocationIsEmpty(in));
+        } catch (IOException e) {
+            fail("Could not create directory");
+        } finally {
+            deleteTempDir(in.localLocation);
+        }
+    }
+
+    @Test
     public void checkIsRemoteLocationAccessible() {
         Input in = this.createInput("test3", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
