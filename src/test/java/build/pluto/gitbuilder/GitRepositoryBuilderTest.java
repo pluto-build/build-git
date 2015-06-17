@@ -23,7 +23,7 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkLocalLocationExists() {
-        GitRepositoryBuilder.Input in = this.createInput("test", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         File local = new File("test");
         try {
@@ -38,28 +38,28 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkLocalLocationExistsNot() {
-        GitRepositoryBuilder.Input in = this.createInput("test2", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test2", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         assertFalse(b.localLocationExists(in));
     }
 
     @Test
     public void checkIsRemoteLocationAccessible() {
-        GitRepositoryBuilder.Input in = this.createInput("test3", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test3", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         assertTrue(b.isRemoteLocationAccessible(in));
     }
 
     @Test
     public void checkIsRemoteLocationAccessibleNot() {
-        GitRepositoryBuilder.Input in = this.createInput("test3", "https://github.com/andidep/dummy.git", "master");
+        Input in = this.createInput("test3", "https://github.com/andidep/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         assertFalse(b.isRemoteLocationAccessible(in));
     }
 
     @Test
     public void checkCloneRepository() {
-        GitRepositoryBuilder.Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         this.deleteTempDir(in.localLocation);
         assertFalse(FileCommands.exists(in.localLocation));
@@ -77,7 +77,7 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkIsLocalLocationRemoteSet() {
-        GitRepositoryBuilder.Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         b.cloneRepository(in);
         assertTrue(b.isRemoteSet(in));
@@ -86,7 +86,7 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkIsLocalLocationRemoteNotSet() {
-        GitRepositoryBuilder.Input in = this.createInput("test6", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test6", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         try {
             b.cloneRepository(in);
@@ -103,7 +103,7 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkPull() {
-        GitRepositoryBuilder.Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         this.deleteTempDir(in.localLocation);
         b.cloneRepository(in);
@@ -128,7 +128,7 @@ public class GitRepositoryBuilderTest {
 
 //    @Test
     public void checkPullWithLocalCommit() {
-        GitRepositoryBuilder.Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         this.deleteTempDir(in.localLocation);
         b.cloneRepository(in);
@@ -154,9 +154,9 @@ public class GitRepositoryBuilderTest {
         }
     }
 
-    private GitRepositoryBuilder.Input createInput(String local, String remote, String branch) {
+    private Input createInput(String local, String remote, String branch) {
         File localFile = new File(local);
-        GitRepositoryBuilder.Input.Builder inputBuilder = new GitRepositoryBuilder.Input.Builder(localFile, remote, branch, null);
+        Input.Builder inputBuilder = new Input.Builder(localFile, remote, branch, null);
         return inputBuilder.build();
     }
 
