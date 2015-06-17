@@ -42,14 +42,14 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         //TODO: think I don't need to require any files
         if (!localExists(input) || localIsEmpty(input)) {
             if (isRemoteAccessible(input)) {
-                cloneRepository(input);
+                clone(input);
             } else {
                 throw new TransportException(input.remote + " can not be accessed");
             }
         } else {
             if (isLocalRepo(input)) {
                 if (isRemoteAccessible(input) && isRemoteSet(input)) {
-                    pullRepository(input);
+                    pull(input);
                 } else {
                     //do nothing
                 }
@@ -89,7 +89,7 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         return true;
     }
 
-    public void cloneRepository(Input input) {
+    public void clone(Input input) {
         try {
             Git result = Git.cloneRepository()
                     .setURI(input.remote)
@@ -132,7 +132,7 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         }
     }
 
-    public void pullRepository(Input input) throws NotMergedException {
+    public void pull(Input input) throws NotMergedException {
         FetchResult fetchResult = fetch(input);
         if (fetchResult != null) {
             MergeResult mergeResult = merge(input, fetchResult.getAdvertisedRef("HEAD"));
