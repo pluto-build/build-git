@@ -3,10 +3,7 @@ package build.pluto.gitbuilder;
 import build.pluto.builder.Builder;
 import build.pluto.output.None;
 import org.eclipse.jgit.api.*;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.NotMergedException;
-import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.FetchResult;
@@ -79,30 +76,21 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
     public boolean isRemoteAccessible(Input input) {
         try {
             Git.lsRemoteRepository().setRemote(input.remote).call();
-        } catch (InvalidRemoteException e) {
-            return false;
-        } catch (TransportException e) {
-            return false;
         } catch (GitAPIException e) {
-            e.printStackTrace();
+            return false;
         }
         return true;
     }
 
-    public void clone(Input input) {
+    public void clone(Input input) throws NotClonedException {
         try {
             Git result = Git.cloneRepository()
-                    .setURI(input.remote)
-                    .setDirectory(input.local)
-                    .setBranch(input.branchName)
-                    .call();
-        } catch (InvalidRemoteException e) {
-            System.out.println("INVALID REPO");
-        } catch (TransportException e) {
-            System.out.println("TRANSPORT FAILURE");
-//            throw e;
+                            .setURI(input.remote)
+                            .setDirectory(input.local)
+                            .setBranch(input.branchName)
+                            .call();
         } catch (GitAPIException e) {
-            System.out.println("GIT FAILURE");
+            throw new NotClonedException();
         }
     }
 
@@ -132,50 +120,49 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         }
     }
 
-    public void pull(Input input) throws NotMergedException {
-        FetchResult fetchResult = fetch(input);
-        if (fetchResult != null) {
-            MergeResult mergeResult = merge(input, fetchResult.getAdvertisedRef("HEAD"));
-            if (mergeResult != null) {
-                if (mergeResult.getMergeStatus().isSuccessful()) {
-                    return;
-                }
-            }
+    public void pull(Input input) throws NotPulledException {
+        FetchResult fetchResult = null;
+        try {
+            fetchResult = fetch(input);
+        } catch (NotFetchedException e) {
+            throw new NotPulledException();
         }
-        throw new NotMergedException();
+        try {
+            MergeResult mergeResult = merge(input, fetchResult.getAdvertisedRef("HEAD"));
+            if (!mergeResult.getMergeStatus().isSuccessful()) {
+                throw new NotPulledException();
+            }
+        } catch (NotMergedException e) {
+            throw new NotPulledException();
+        }
     }
 
-    public FetchResult fetch(Input input) {
+    public FetchResult fetch(Input input) throws NotFetchedException {
         try {
             Git g = Git.open(input.local);
             FetchCommand fetch = g.fetch();
             return fetch.call();
-        } catch (GitAPIException e1) {
-            e1.printStackTrace();
-        } catch (IOException e1) {
-            e1.printStackTrace();
+        } catch (GitAPIException e) {
+            throw new NotFetchedException();
+        } catch (IOException e) {
+            throw new NotFetchedException();
         }
-        return null;
     }
 
-    public MergeResult merge(Input input, Ref ref) {
-        Git g = null;
+    public MergeResult merge(Input input, Ref ref) throws NotMergedException {
         try {
-            g = Git.open(input.local);
-        } catch (IOException e1) {
-            return null;
-        }
-        MergeCommand merge = g.merge();
-        merge.include(ref);
-        merge.setCommit(input.createMergeCommit);
-        merge.setSquash(input.squashCommit);
-        merge.setFastForward(input.ffMode);
-        merge.setStrategy(input.mergeStrategy);
-        try {
+            Git g = Git.open(input.local);
+            MergeCommand merge = g.merge();
+            merge.include(ref);
+            merge.setCommit(input.createMergeCommit);
+            merge.setSquash(input.squashCommit);
+            merge.setFastForward(input.ffMode);
+            merge.setStrategy(input.mergeStrategy);
             return merge.call();
-        } catch (GitAPIException e1) {
-            e1.printStackTrace();
+        } catch (IOException e) {
+            throw new NotMergedException();
+        } catch (GitAPIException e) {
+            throw new NotMergedException();
         }
-        return null;
     }
 }

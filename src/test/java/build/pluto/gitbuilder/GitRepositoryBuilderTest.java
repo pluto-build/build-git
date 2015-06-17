@@ -93,7 +93,11 @@ public class GitRepositoryBuilderTest {
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         this.deleteTempDir(in.local);
         assertFalse(FileCommands.exists(in.local));
-        b.clone(in);
+        try {
+            b.clone(in);
+        } catch (NotClonedException e) {
+            fail("Could not clone");
+        }
         assertTrue(FileCommands.exists(in.local));
         boolean fileExists = false;
         for (Path p : FileCommands.listFilesRecursive(in.local.toPath())) {
@@ -109,7 +113,11 @@ public class GitRepositoryBuilderTest {
     public void checkIsLocalRemoteSet() {
         Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
-        b.clone(in);
+        try {
+            b.clone(in);
+        } catch (NotClonedException e) {
+            fail("could not clone");
+        }
         assertTrue(b.isRemoteSet(in));
         deleteTempDir(in.local);
     }
@@ -127,6 +135,8 @@ public class GitRepositoryBuilderTest {
             assertFalse(b.isRemoteSet(in));
         } catch (IOException e) {
             fail("Could not create directory");
+        } catch (NotClonedException e) {
+            fail("Could not clone");
         } finally {
             deleteTempDir(in.local);
         }
@@ -137,14 +147,22 @@ public class GitRepositoryBuilderTest {
         Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         this.deleteTempDir(in.local);
-        b.clone(in);
+        try {
+            b.clone(in);
+        } catch (NotClonedException e) {
+            fail("Could not clone");
+        }
         try {
             String content = FileCommands.readFileAsString(new File(in.local, "README.md"));
             assertEquals(content, "This is a dummy repository for testing.\n");
             Git.open(in.local).reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD^").call();
             content = FileCommands.readFileAsString(new File(in.local, "README.md"));
             assertEquals(content, "This is a dummy repository for testing\n");
-            b.pull(in);
+            try {
+                b.pull(in);
+            } catch (NotPulledException e) {
+                fail("Could not pull");
+            }
             content = FileCommands.readFileAsString(new File(in.local, "README.md"));
             assertEquals(content, "This is a dummy repository for testing.\n");
         } catch (IOException e) {
@@ -160,34 +178,34 @@ public class GitRepositoryBuilderTest {
     }
 
 //    @Test
-    public void checkPullWithLocalCommit() {
-        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
-        GitRepositoryBuilder b = new GitRepositoryBuilder(in);
-        this.deleteTempDir(in.local);
-        b.clone(in);
-        try {
-            String content = FileCommands.readFileAsString(new File(in.local, "README.md"));
-            assertEquals(content, "This is a dummy repository for testing.\n");
-            Git.open(in.local).reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD^").call();
-            content = FileCommands.readFileAsString(new File(in.local, "README.md"));
-            assertEquals(content, "This is a dummy repository for testing\n");
-            FileCommands.writeToFile(new File(in.local, "README.md"), "This is a dummy repository for testing.\nLocal Change.");
-            Git.open(in.local).add().addFilepattern("README.md").call();
-            Git.open(in.local).commit().setMessage("local changes").call();
-            b.pull(in);
-            content = FileCommands.readFileAsString(new File(in.local, "README.md"));
-            System.out.println(content);
-            assertEquals(content, "This is a dummy repository for testing.\n\nLocal Change.\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (CheckoutConflictException e) {
-            e.printStackTrace();
-        } catch (GitAPIException e) {
-            e.printStackTrace();
-        } finally {
-            deleteTempDir(in.local);
-        }
-    }
+//    public void checkPullWithLocalCommit() {
+//        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
+//        GitRepositoryBuilder b = new GitRepositoryBuilder(in);
+//        this.deleteTempDir(in.local);
+//        b.clone(in);
+//        try {
+//            String content = FileCommands.readFileAsString(new File(in.local, "README.md"));
+//            assertEquals(content, "This is a dummy repository for testing.\n");
+//            Git.open(in.local).reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD^").call();
+//            content = FileCommands.readFileAsString(new File(in.local, "README.md"));
+//            assertEquals(content, "This is a dummy repository for testing\n");
+//            FileCommands.writeToFile(new File(in.local, "README.md"), "This is a dummy repository for testing.\nLocal Change.");
+//            Git.open(in.local).add().addFilepattern("README.md").call();
+//            Git.open(in.local).commit().setMessage("local changes").call();
+//            b.pull(in);
+//            content = FileCommands.readFileAsString(new File(in.local, "README.md"));
+//            System.out.println(content);
+//            assertEquals(content, "This is a dummy repository for testing.\n\nLocal Change.\n");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (CheckoutConflictException e) {
+//            e.printStackTrace();
+//        } catch (GitAPIException e) {
+//            e.printStackTrace();
+//        } finally {
+//            deleteTempDir(in.local);
+//        }
+//    }
 
     private Input createInput(String local, String remote, String branch) {
         File localFile = new File(local);
