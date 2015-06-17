@@ -122,7 +122,7 @@ public class GitRepositoryBuilderTest {
             b.cloneRepository(in);
             Repository repo = Git.open(in.local).getRepository();
             StoredConfig config = repo.getConfig();
-            config.unset("remote", "origin", in.remote);
+            config.unsetSection("remote", "origin");
             config.save();
             assertFalse(b.isRemoteSet(in));
         } catch (IOException e) {
@@ -153,6 +153,8 @@ public class GitRepositoryBuilderTest {
             e.printStackTrace();
         } catch (GitAPIException e) {
             e.printStackTrace();
+        } finally {
+            deleteTempDir(in.local);
         }
 
     }
@@ -182,6 +184,8 @@ public class GitRepositoryBuilderTest {
             e.printStackTrace();
         } catch (GitAPIException e) {
             e.printStackTrace();
+        } finally {
+            deleteTempDir(in.local);
         }
     }
 
