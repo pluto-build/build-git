@@ -37,7 +37,6 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
 
     @Override
     protected None build(Input in) throws Throwable {
-        //How do I indicate that the given parameters are not valid?
         //TODO: think I don't need to require any files
         if (!localLocationExists(in) || localLocationIsEmpty(in)) {
             if (isRemoteLocationAccessible(in)) {
