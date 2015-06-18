@@ -22,21 +22,21 @@ import static org.junit.Assert.assertTrue;
 public class GitHandlerTest {
     @Test
     public void checkIsRemoteAccessible() {
-        Input in = this.createInput("test6", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test6", "https://github.com/andiderp/dummy.git");
         GitHandler tested = new GitHandler(in);
         assertTrue(tested.isRemoteAccessible());
     }
 
     @Test
     public void checkNotIsRemoteAccessible() {
-        Input in = this.createInput("test6", "https://github.com/andider/dummy.git", "master");
+        Input in = this.createInput("test6", "https://github.com/andider/dummy.git");
         GitHandler tested = new GitHandler(in);
         assertFalse(tested.isRemoteAccessible());
     }
 
     @Test
     public void checkClone() {
-        Input in = this.createInput("test8", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test8", "https://github.com/andiderp/dummy.git");
         GitHandler tested = new GitHandler(in);
         this.deleteTempDir(in.local);
         TestCase.assertFalse(FileCommands.exists(in.local));
@@ -58,7 +58,7 @@ public class GitHandlerTest {
 
     @Test
     public void checkIsRemoteSet() {
-        Input in = this.createInput("test9", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test9", "https://github.com/andiderp/dummy.git");
         GitHandler tested = new GitHandler(in);
         try {
             tested.cloneRepository();
@@ -72,7 +72,7 @@ public class GitHandlerTest {
 
     @Test
     public void checkIsLocalRemoteNotSet() {
-        Input in = this.createInput("test10", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test10", "https://github.com/andiderp/dummy.git");
         GitHandler tested = new GitHandler(in);
         try {
             tested.cloneRepository();
@@ -92,7 +92,7 @@ public class GitHandlerTest {
 
     @Test
     public void checkPull() {
-        Input in = this.createInput("test11", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test11", "https://github.com/andiderp/dummy.git");
         GitHandler tested = new GitHandler(in);
         this.deleteTempDir(in.local);
         try {
@@ -126,7 +126,7 @@ public class GitHandlerTest {
 
     @Test(expected = NotPulledException.class)
     public void checkPullWithLocalCommit() throws NotPulledException {
-        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git");
         GitHandler tested = new GitHandler(in);
         this.deleteTempDir(in.local);
         try {
@@ -148,9 +148,9 @@ public class GitHandlerTest {
         deleteTempDir(in.local);
     }
 
-    private Input createInput(String local, String remote, String branch) {
+    private Input createInput(String local, String remote) {
         File localFile = new File(local);
-        Input.Builder inputBuilder = new Input.Builder(localFile, remote, branch, null);
+        Input.Builder inputBuilder = new Input.Builder(localFile, remote, null);
         return inputBuilder.build();
     }
 

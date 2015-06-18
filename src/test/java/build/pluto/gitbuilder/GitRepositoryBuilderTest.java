@@ -10,12 +10,11 @@ import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
 public class GitRepositoryBuilderTest {
 
     @Test
     public void checkLocalExists() {
-        Input in = this.createInput("test", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test", "https://github.com/andiderp/dummy.git");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         File local = new File("test");
         try {
@@ -30,14 +29,14 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkLocalExistsNot() {
-        Input in = this.createInput("test2", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test2", "https://github.com/andiderp/dummy.git");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         assertFalse(b.localExists(in));
     }
 
     @Test
     public void checkIsLocalEmpty() {
-        Input in = this.createInput("test3", null, null);
+        Input in = this.createInput("test3", null);
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         try {
             FileCommands.createDir(in.local.toPath());
@@ -51,7 +50,7 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkIsLocalEmptyWithDotFile() {
-        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         try {
             FileCommands.createDir(in.local.toPath());
@@ -67,7 +66,7 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkIsLocalNotEmpty() {
-        Input in = this.createInput("test5", null, null);
+        Input in = this.createInput("test5", null);
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         try {
             FileCommands.createDir(in.local.toPath());
@@ -81,9 +80,9 @@ public class GitRepositoryBuilderTest {
         }
     }
 
-    private Input createInput(String local, String remote, String branch) {
+    private Input createInput(String local, String remote) {
         File localFile = new File(local);
-        Input.Builder inputBuilder = new Input.Builder(localFile, remote, branch, null);
+        Input.Builder inputBuilder = new Input.Builder(localFile, remote, null);
         return inputBuilder.build();
     }
 
