@@ -1,8 +1,7 @@
 package build.pluto.gitbuilder;
 
 import org.eclipse.jgit.api.ResetCommand;
-import org.eclipse.jgit.api.errors.CheckoutConflictException;
-import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.junit.Test;
@@ -30,7 +29,7 @@ public class GitRepositoryBuilderTest {
             FileCommands.createDir(local.toPath());
             assertTrue(b.localExists(in));
         } catch (IOException e) {
-            e.printStackTrace();
+            fail("Could not create temporary directory");
         } finally {
             this.deleteTempDir(local);
         }
@@ -45,13 +44,29 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkIsLocalEmpty() {
-        Input in = this.createInput("test7", null, null);
+        Input in = this.createInput("test3", null, null);
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         try {
             FileCommands.createDir(in.local.toPath());
             assertTrue(b.localIsEmpty(in));
         } catch (IOException e) {
-            fail("Could not create directory");
+            fail("Could not create temporary directory");
+        } finally {
+            deleteTempDir(in.local);
+        }
+    }
+
+    @Test
+    public void checkIsLocalEmptyWithDotFile() {
+        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
+        GitRepositoryBuilder b = new GitRepositoryBuilder(in);
+        try {
+            FileCommands.createDir(in.local.toPath());
+            File dotFile = new File(in.local, ".vimrc");
+            FileCommands.createFile(dotFile);
+            assertFalse(b.localIsEmpty(in));
+        } catch (IOException e) {
+            fail("Could not create temporary directory");
         } finally {
             deleteTempDir(in.local);
         }
@@ -59,7 +74,7 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkIsLocalNotEmpty() {
-        Input in = this.createInput("test8", null, null);
+        Input in = this.createInput("test5", null, null);
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         try {
             FileCommands.createDir(in.local.toPath());
@@ -67,7 +82,7 @@ public class GitRepositoryBuilderTest {
             FileCommands.createFile(file);
             assertFalse(b.localIsEmpty(in));
         } catch (IOException e) {
-            fail("Could not create directory");
+            fail("Could not create temporary directory");
         } finally {
             deleteTempDir(in.local);
         }
@@ -75,28 +90,28 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkIsRemoteAccessible() {
-        Input in = this.createInput("test3", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test6", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         assertTrue(b.isRemoteAccessible(in));
     }
 
     @Test
     public void checkIsRemoteAccessibleNot() {
-        Input in = this.createInput("test3", "https://github.com/andidep/dummy.git", "master");
+        Input in = this.createInput("test7", "https://github.com/andidep/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         assertFalse(b.isRemoteAccessible(in));
     }
 
     @Test
-    public void checkCloneRepository() {
-        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
+    public void checkClone() {
+        Input in = this.createInput("test8", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         this.deleteTempDir(in.local);
         assertFalse(FileCommands.exists(in.local));
         try {
             b.clone(in);
         } catch (NotClonedException e) {
-            fail("Could not clone");
+            fail("Could not clone repository");
         }
         assertTrue(FileCommands.exists(in.local));
         boolean fileExists = false;
@@ -111,20 +126,21 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkIsLocalRemoteSet() {
-        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test9", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         try {
             b.clone(in);
+            assertTrue(b.isRemoteSet(in));
         } catch (NotClonedException e) {
-            fail("could not clone");
+            fail("could not clone repository");
+        } finally {
+            deleteTempDir(in.local);
         }
-        assertTrue(b.isRemoteSet(in));
-        deleteTempDir(in.local);
     }
 
     @Test
     public void checkIsLocalRemoteNotSet() {
-        Input in = this.createInput("test6", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test10", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         try {
             b.clone(in);
@@ -134,9 +150,9 @@ public class GitRepositoryBuilderTest {
             config.save();
             assertFalse(b.isRemoteSet(in));
         } catch (IOException e) {
-            fail("Could not create directory");
+            fail("Could not open repository");
         } catch (NotClonedException e) {
-            fail("Could not clone");
+            fail("Could not clone repository");
         } finally {
             deleteTempDir(in.local);
         }
@@ -144,13 +160,13 @@ public class GitRepositoryBuilderTest {
 
     @Test
     public void checkPull() {
-        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git", "master");
+        Input in = this.createInput("test11", "https://github.com/andiderp/dummy.git", "master");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         this.deleteTempDir(in.local);
         try {
             b.clone(in);
         } catch (NotClonedException e) {
-            fail("Could not clone");
+            fail("Could not clone repository");
         }
         try {
             String content = FileCommands.readFileAsString(new File(in.local, "README.md"));
@@ -161,7 +177,7 @@ public class GitRepositoryBuilderTest {
             try {
                 b.pull(in);
             } catch (NotPulledException e) {
-                fail("Could not pull");
+                fail("Could not pull repository");
             }
             content = FileCommands.readFileAsString(new File(in.local, "README.md"));
             assertEquals(content, "This is a dummy repository for testing.\n");
