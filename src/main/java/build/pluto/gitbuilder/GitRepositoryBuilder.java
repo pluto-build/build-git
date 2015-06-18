@@ -2,18 +2,12 @@ package build.pluto.gitbuilder;
 
 import build.pluto.builder.Builder;
 import build.pluto.output.None;
-import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.*;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.StoredConfig;
-import org.eclipse.jgit.transport.FetchResult;
 import org.sugarj.common.FileCommands;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
 
 public class GitRepositoryBuilder extends Builder<Input, None> {
 
