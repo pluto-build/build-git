@@ -39,6 +39,7 @@ public class GitHandler {
             this.git = Git.cloneRepository()
                     .setURI(input.remote)
                     .setDirectory(input.local)
+                    .setCloneAllBranches(true)
                     .setBranch(input.branchName)
                     .call();
         } catch (GitAPIException e) {
