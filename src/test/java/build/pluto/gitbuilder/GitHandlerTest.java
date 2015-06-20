@@ -1,6 +1,5 @@
 package build.pluto.gitbuilder;
 
-import junit.framework.TestCase;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
@@ -14,8 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -39,7 +38,7 @@ public class GitHandlerTest {
         Input in = this.createInput("test8", "https://github.com/andiderp/dummy.git");
         GitHandler tested = new GitHandler(in);
         this.deleteTempDir(in.local);
-        TestCase.assertFalse(FileCommands.exists(in.local));
+        assertFalse(FileCommands.exists(in.local));
         try {
             tested.cloneRepository();
         } catch (NotClonedException e) {
