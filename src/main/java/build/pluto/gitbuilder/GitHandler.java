@@ -39,12 +39,22 @@ public class GitHandler {
             this.git = Git.cloneRepository()
                     .setURI(input.remote)
                     .setDirectory(input.local)
-                    .setCloneAllBranches(true)
                     .setBranch(input.branchName)
                     .call();
         } catch (GitAPIException e) {
             this.git = null;
             throw new NotClonedException();
+        }
+    }
+
+    public void checkout(String branchName) throws NotCheckedOutException {
+        openRepository();
+        try {
+            git.checkout()
+               .setName(branchName)
+               .call();
+        } catch (GitAPIException e) {
+            throw new NotCheckedOutException();
         }
     }
 

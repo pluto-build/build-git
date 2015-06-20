@@ -41,6 +41,7 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         } else {
             if (GitHandler.isRepo(input.local) && git.isRemoteSet()) {
                 if (git.isRemoteAccessible()) {
+                    git.checkout(input.branchName);
                     git.pull();
                 } else {
                     //do nothing
