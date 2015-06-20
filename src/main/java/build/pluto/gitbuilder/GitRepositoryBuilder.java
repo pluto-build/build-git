@@ -53,8 +53,9 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
 
         //TODO: maybe only provide files not ignored by .gitignore
         List<Path> outputFiles = FileCommands.listFilesRecursive(input.local.toPath());
+        File gitDirectory = new File(input.local, ".git");
         for (Path p : outputFiles) {
-            if (!p.toAbsolutePath().toString().contains(".git")) {
+            if (!containsFile(gitDirectory, p.toFile())) {
                 provide(p.toFile());
             }
         }
@@ -67,5 +68,9 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
 
     public boolean localIsEmpty(Input input) {
         return FileCommands.listFilesRecursive(input.local.toPath()).size() == 0;
+    }
+
+    public boolean containsFile(File directory, File file) {
+        return file.getAbsolutePath().contains(directory.getName() + "/");
     }
 }

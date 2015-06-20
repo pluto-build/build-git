@@ -80,6 +80,34 @@ public class GitRepositoryBuilderTest {
         }
     }
 
+    @Test
+    public void checkContainsFile() {
+        Input in = this.createInput("test6", null);
+        GitRepositoryBuilder b = new GitRepositoryBuilder(in);
+
+        File test6 = new File("test6");
+        File test = new File(test6, ".test");
+        File testFile = new File(test6, "test.txt");
+        File testFile2 = new File(test, "test.txt");
+
+        try {
+            FileCommands.createDir(test6.toPath());
+            FileCommands.createDir(test.toPath());
+            FileCommands.createFile(testFile);
+            FileCommands.createFile(testFile2);
+            assertTrue(b.containsFile(test6, testFile));
+            assertTrue(b.containsFile(test6, testFile2));
+            assertFalse(b.containsFile(test, testFile));
+            assertFalse(b.containsFile(test, test6));
+            assertTrue(b.containsFile(test, testFile2));
+            assertTrue(b.containsFile(test6, test));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            deleteTempDir(test6);
+            deleteTempDir(test);
+        }
+    }
     private Input createInput(String local, String remote) {
         File localFile = new File(local);
         Input.Builder inputBuilder = new Input.Builder(localFile, remote, null);
