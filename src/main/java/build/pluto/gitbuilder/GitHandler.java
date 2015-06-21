@@ -78,7 +78,9 @@ public class GitHandler {
     private FetchResult fetch() throws NotFetchedException {
         openRepository();
         try {
-            FetchCommand fetch = git.fetch();
+            String url = getRemoteOfUrl();
+            FetchCommand fetch = git.fetch()
+                                    .setRemote(url);
             return fetch.call();
         } catch (GitAPIException e) {
             throw new NotFetchedException();
@@ -100,6 +102,18 @@ public class GitHandler {
         }
     }
 
+    private String getRemoteOfUrl() {
+        openRepository();
+        StoredConfig config = git.getRepository().getConfig();
+        Set<String> remotes = config.getSubsections("remote");
+        for (String remote : remotes) {
+            String url = config.getString("remote", remote, "url");
+            if(url.equals(input.remote)) {
+                return remote;
+            }
+        }
+        return null;
+    }
     public boolean isRemoteSet() {
         openRepository();
         StoredConfig config = git.getRepository().getConfig();
