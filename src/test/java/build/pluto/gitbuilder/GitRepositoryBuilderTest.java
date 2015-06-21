@@ -19,7 +19,7 @@ public class GitRepositoryBuilderTest {
         File local = new File("test");
         try {
             FileCommands.createDir(local.toPath());
-            assertTrue(b.localExists(in));
+            assertTrue(b.directoryExists(in));
         } catch (IOException e) {
             fail("Could not create temporary directory");
         } finally {
@@ -31,7 +31,7 @@ public class GitRepositoryBuilderTest {
     public void checkLocalExistsNot() {
         Input in = this.createInput("test2", "https://github.com/andiderp/dummy.git");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
-        assertFalse(b.localExists(in));
+        assertFalse(b.directoryExists(in));
     }
 
     @Test
@@ -39,12 +39,12 @@ public class GitRepositoryBuilderTest {
         Input in = this.createInput("test3", null);
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         try {
-            FileCommands.createDir(in.local.toPath());
-            assertTrue(b.localIsEmpty(in));
+            FileCommands.createDir(in.directory.toPath());
+            assertTrue(b.directoryIsEmpty(in));
         } catch (IOException e) {
             fail("Could not create temporary directory");
         } finally {
-            deleteTempDir(in.local);
+            deleteTempDir(in.directory);
         }
     }
 
@@ -53,14 +53,14 @@ public class GitRepositoryBuilderTest {
         Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git");
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         try {
-            FileCommands.createDir(in.local.toPath());
-            File dotFile = new File(in.local, ".vimrc");
+            FileCommands.createDir(in.directory.toPath());
+            File dotFile = new File(in.directory, ".dot");
             FileCommands.createFile(dotFile);
-            assertFalse(b.localIsEmpty(in));
+            assertFalse(b.directoryIsEmpty(in));
         } catch (IOException e) {
             fail("Could not create temporary directory");
         } finally {
-            deleteTempDir(in.local);
+            deleteTempDir(in.directory);
         }
     }
 
@@ -69,14 +69,14 @@ public class GitRepositoryBuilderTest {
         Input in = this.createInput("test5", null);
         GitRepositoryBuilder b = new GitRepositoryBuilder(in);
         try {
-            FileCommands.createDir(in.local.toPath());
-            File file = new File(in.local, "test.txt");
+            FileCommands.createDir(in.directory.toPath());
+            File file = new File(in.directory, "test.txt");
             FileCommands.createFile(file);
-            assertFalse(b.localIsEmpty(in));
+            assertFalse(b.directoryIsEmpty(in));
         } catch (IOException e) {
             fail("Could not create temporary directory");
         } finally {
-            deleteTempDir(in.local);
+            deleteTempDir(in.directory);
         }
     }
 

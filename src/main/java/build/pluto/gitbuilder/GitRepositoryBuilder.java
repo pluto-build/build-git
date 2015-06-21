@@ -17,7 +17,7 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
 
     @Override
     protected String description(Input input) {
-        return "Keeps the directory " + input.local.toString() + " in sync with " + input.remote;
+        return "Keeps the directory " + input.directory.toString() + " in sync with " + input.url;
     }
 
     @Override
@@ -30,30 +30,29 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
 
     @Override
     protected None build(Input input) throws Throwable {
-        //TODO: think I don't need to require any files
         GitHandler git = new GitHandler(input);
-        if (!localExists(input) || localIsEmpty(input)) {
-            if (git.isRemoteAccessible()) {
+        if (!directoryExists(input) || directoryIsEmpty(input)) {
+            if (git.isUrlAccessible()) {
                 git.cloneRepository();
             } else {
-                throw new TransportException(input.remote + " can not be accessed");
+                throw new TransportException(input.url + " can not be accessed");
             }
         } else {
-            if (GitHandler.isRepo(input.local) && git.isRemoteSet()) {
-                if (git.isRemoteAccessible()) {
+            if (GitHandler.isRepo(input.directory) && git.isUrlSet()) {
+                if (git.isUrlAccessible()) {
                     git.checkout(input.branchName);
                     git.pull();
                 } else {
                     //do nothing
                 }
             } else {
-                throw new IllegalArgumentException(input.local.toString() + " is not empty and does contains other data than the repository");
+                throw new IllegalArgumentException(input.directory.toString() + " is not empty and does contains other data than the repository");
             }
         }
 
         //TODO: maybe only provide files not ignored by .gitignore
-        List<Path> outputFiles = FileCommands.listFilesRecursive(input.local.toPath());
-        File gitDirectory = new File(input.local, ".git");
+        List<Path> outputFiles = FileCommands.listFilesRecursive(input.directory.toPath());
+        File gitDirectory = new File(input.directory, ".git");
         for (Path p : outputFiles) {
             if (!containsFile(gitDirectory, p.toFile())) {
                 provide(p.toFile());
@@ -62,12 +61,12 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         return None.val;
     }
 
-    public boolean localExists(Input input) {
-        return FileCommands.exists(input.local);
+    public boolean directoryExists(Input input) {
+        return FileCommands.exists(input.directory);
     }
 
-    public boolean localIsEmpty(Input input) {
-        return FileCommands.listFilesRecursive(input.local.toPath()).size() == 0;
+    public boolean directoryIsEmpty(Input input) {
+        return FileCommands.listFilesRecursive(input.directory.toPath()).size() == 0;
     }
 
     public boolean containsFile(File directory, File file) {

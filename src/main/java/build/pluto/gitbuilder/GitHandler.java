@@ -26,7 +26,7 @@ public class GitHandler {
     private Git openRepository() {
         if (this.git != null) {
             try {
-                this.git = Git.open(input.local);
+                this.git = Git.open(input.directory);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -37,8 +37,8 @@ public class GitHandler {
     public void cloneRepository() throws NotClonedException {
         try {
             this.git = Git.cloneRepository()
-                    .setURI(input.remote)
-                    .setDirectory(input.local)
+                    .setURI(input.url)
+                    .setDirectory(input.directory)
                     .setBranch(input.branchName)
                     .call();
         } catch (GitAPIException e) {
@@ -108,29 +108,29 @@ public class GitHandler {
         Set<String> remotes = config.getSubsections("remote");
         for (String remote : remotes) {
             String url = config.getString("remote", remote, "url");
-            if(url.equals(input.remote)) {
+            if(url.equals(input.url)) {
                 return remote;
             }
         }
         return null;
     }
-    public boolean isRemoteSet() {
+    public boolean isUrlSet() {
         openRepository();
         StoredConfig config = git.getRepository().getConfig();
         Set<String> remotes = config.getSubsections("remote");
         boolean foundRemote = false;
         for (String remote : remotes) {
             String url = config.getString("remote", remote, "url");
-            if (url.equals(input.remote)) {
+            if (url.equals(input.url)) {
                 foundRemote = true;
             }
         }
         return foundRemote;
     }
 
-    public boolean isRemoteAccessible() {
+    public boolean isUrlAccessible() {
         try {
-            Git.lsRemoteRepository().setRemote(input.remote).call();
+            Git.lsRemoteRepository().setRemote(input.url).call();
         } catch (GitAPIException e) {
             return false;
         }

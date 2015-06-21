@@ -8,8 +8,8 @@ import java.io.Serializable;
 
 public class Input implements Serializable {
     private static final long serialVersionUID = -1L;
-    public final File local;
-    public final String remote;
+    public final File directory;
+    public final String url;
     public final File summaryLocation;
 
     public final String branchName;
@@ -20,8 +20,8 @@ public class Input implements Serializable {
 
 
     private Input(Builder builder) {
-        this.local = builder.local;
-        this.remote = builder.remote;
+        this.directory = builder.directory;
+        this.url = builder.url;
         this.summaryLocation = builder.summaryLocation;
         this.branchName = builder.branchName;
         this.ffMode = builder.ffMode;
@@ -31,8 +31,8 @@ public class Input implements Serializable {
     }
 
     public static class Builder {
-        private final File local;
-        private final String remote;
+        private final File directory;
+        private final String url;
         private final File summaryLocation;
 
         private String branchName = "master";
@@ -41,9 +41,9 @@ public class Input implements Serializable {
         private boolean createMergeCommit = false;
         private boolean squashCommit = false;
 
-        public Builder(File local, String remote, File summaryLocation) {
-            this.local = local == null ? new File(".") : local;
-            this.remote = remote;
+        public Builder(File directory, String url, File summaryLocation) {
+            this.directory = directory == null ? new File(".") : directory;
+            this.url = url;
             this.summaryLocation = summaryLocation == null ? new File(".") : summaryLocation;
         }
 
