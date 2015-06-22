@@ -38,13 +38,11 @@ public class GitHandlerTest {
         Input in = this.createInput("test8", "https://github.com/andiderp/dummy.git");
         GitHandler tested = new GitHandler(in);
         this.deleteTempDir(in.directory);
-        assertFalse(FileCommands.exists(in.directory));
         try {
             tested.cloneRepository();
         } catch (NotClonedException e) {
             fail("Could not clone repository");
         }
-        assertTrue(FileCommands.exists(in.directory));
         boolean fileExists = false;
         for (Path p : FileCommands.listFilesRecursive(in.directory.toPath())) {
             if (p.getFileName().toString().equals("README.md")) {
@@ -103,8 +101,6 @@ public class GitHandlerTest {
             String content = FileCommands.readFileAsString(new File(in.directory, "README.md"));
             assertEquals(content, "This is a dummy repository for testing.\n");
             Git.open(in.directory).reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD^").call();
-            content = FileCommands.readFileAsString(new File(in.directory, "README.md"));
-            assertEquals(content, "This is a dummy repository for testing\n");
             try {
                 tested.pull();
             } catch (NotPulledException e) {
@@ -127,7 +123,6 @@ public class GitHandlerTest {
     public void checkPullWithLocalCommit() throws NotPulledException {
         Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git");
         GitHandler tested = new GitHandler(in);
-        this.deleteTempDir(in.directory);
         try {
             tested.cloneRepository();
         } catch (NotClonedException e) {
@@ -139,9 +134,9 @@ public class GitHandlerTest {
             Git.open(in.directory).add().addFilepattern("README.md").call();
             Git.open(in.directory).commit().setMessage("local changes").call();
         } catch (IOException e) {
-            fail("");
+            fail("Could not open the repository");
         } catch (GitAPIException e) {
-            fail("");
+            fail("Could not commit local change");
         }
         tested.pull();
         deleteTempDir(in.directory);
