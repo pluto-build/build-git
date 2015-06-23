@@ -21,19 +21,20 @@ public class GitHandler {
     private Input input;
 
     public GitHandler(Input input) {
-        this.git = null;
+        try {
+            this.git = openRepository(input.directory);
+        } catch(Exception e) {
+            this.git = null;
+        }
         this.input = input;
     }
 
-    private Git openRepository() {
-        if (this.git != null) {
+    private static Git openRepository(File directory) throws Exception {
             try {
-                this.git = Git.open(input.directory);
+                return Git.open(directory);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new Exception();
             }
-        }
-        return this.git;
     }
 
     public void cloneRepository() throws NotClonedException {
@@ -50,7 +51,6 @@ public class GitHandler {
     }
 
     public void checkout(String branchName) throws NotCheckedOutException {
-        openRepository();
         try {
             git.checkout()
                .setName(branchName)
@@ -78,7 +78,6 @@ public class GitHandler {
     }
 
     private FetchResult fetch() throws NotFetchedException {
-        openRepository();
         try {
             String url = getRemoteOfUrl();
             FetchCommand fetch = git.fetch()
@@ -90,7 +89,6 @@ public class GitHandler {
     }
 
     private MergeResult merge(Ref ref) throws NotMergedException {
-        openRepository();
         try {
             MergeCommand merge = git.merge();
             merge.include(ref);
@@ -105,7 +103,6 @@ public class GitHandler {
     }
 
     private String getRemoteOfUrl() {
-        openRepository();
         StoredConfig config = git.getRepository().getConfig();
         Set<String> remotes = config.getSubsections("remote");
         for (String remote : remotes) {
@@ -116,8 +113,8 @@ public class GitHandler {
         }
         return null;
     }
+
     public boolean isUrlSet() {
-        openRepository();
         StoredConfig config = git.getRepository().getConfig();
         Set<String> remotes = config.getSubsections("remote");
         boolean foundRemote = false;
