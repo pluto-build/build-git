@@ -8,9 +8,11 @@ import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.FetchResult;
+import org.eclipse.jgit.lib.ObjectId;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 
 public class GitHandler {
@@ -144,5 +146,23 @@ public class GitHandler {
             return false;
         }
         return true;
+    }
+
+    public static String getHashOfRemoteHEAD(String url, String branch) {
+        try {
+            Collection<Ref> refs = Git.lsRemoteRepository().setRemote(url).setHeads(true).setTags(false).call();
+            for (Ref ref : refs) {
+                boolean isRefOfBranch = ref.getName().contains(branch);
+                if (isRefOfBranch) {
+                    ObjectId objectId = ref.getObjectId();
+                    return ObjectId.toString(objectId);
+                }
+            }
+        } catch (GitAPIException e) {
+            //TODO:throw exception
+            e.printStackTrace();
+            return null;
+        }
+        return null;
     }
 }

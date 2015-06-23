@@ -142,6 +142,18 @@ public class GitHandlerTest {
         deleteTempDir(in.directory);
     }
 
+    @Test
+    public void checkGetHashOfRemoteHEADMaster() {
+        String s = GitHandler.getHashOfRemoteHEAD("https://github.com/andiderp/dummy.git", "master");
+        assertEquals("58ae298272e0865e51e3af36c9989667face301e", s);
+    }
+
+    @Test
+    public void checkGetHashOfRemoteHEADFeature() {
+        String s = GitHandler.getHashOfRemoteHEAD("https://github.com/andiderp/dummy.git", "feature");
+        assertEquals("c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f", s);
+    }
+
     private Input createInput(String local, String remote) {
         File localFile = new File(local);
         Input.Builder inputBuilder = new Input.Builder(localFile, remote, null);
