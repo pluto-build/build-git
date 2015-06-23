@@ -31,6 +31,7 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
     @Override
     protected None build(Input input) throws Throwable {
         GitHandler git = new GitHandler(input);
+        this.require(input.directory, new GitHashStamper(input.url, input.branchName));
         if (!directoryExists(input) || directoryIsEmpty(input)) {
             if (git.isUrlAccessible()) {
                 git.cloneRepository();
