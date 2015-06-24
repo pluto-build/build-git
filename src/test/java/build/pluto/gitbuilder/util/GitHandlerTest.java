@@ -4,49 +4,64 @@ import build.pluto.gitbuilder.Input;
 import build.pluto.gitbuilder.exception.NotClonedException;
 import build.pluto.gitbuilder.exception.NotPulledException;
 import build.pluto.gitbuilder.util.GitHandler;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
-import org.junit.Test;
-import org.sugarj.common.FileCommands;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.sugarj.common.FileCommands;
+
 public class GitHandlerTest {
+
+    private Input in;
+    private GitHandler tested;
+
+    @Before
+    public void init() {
+        this.in = this.createInput("test", "https://github.com/andiderp/dummy.git");
+        this.tested = new GitHandler(in);
+    }
+
+    @After
+    public void destroy() {
+        try {
+            FileCommands.delete(in.directory);
+        } catch (IOException e) {
+            fail("Could not delete temporary directory");
+        }
+    }
+
     @Test
     public void checkIsUrlAccessible() {
-        Input in = this.createInput("test6", "https://github.com/andiderp/dummy.git");
-        GitHandler tested = new GitHandler(in);
         assertTrue(tested.isUrlAccessible());
     }
 
     @Test
     public void checkNotIsUrlAccessible() {
-        Input in = this.createInput("test6", "https://github.com/andider/dummy.git");
+        Input in = this.createInput("test", "https://github.com/andider/dummy.git");
         GitHandler tested = new GitHandler(in);
         assertFalse(tested.isUrlAccessible());
     }
 
     @Test
     public void checkClone() {
-        Input in = this.createInput("test8", "https://github.com/andiderp/dummy.git");
-        GitHandler tested = new GitHandler(in);
-        this.deleteTempDir(in.directory);
-        try {
-            tested.cloneRepository();
-        } catch (NotClonedException e) {
-            fail("Could not clone repository");
-        }
+        this.clone(tested);
         boolean fileExists = false;
         for (Path p : FileCommands.listFilesRecursive(in.directory.toPath())) {
             if (p.getFileName().toString().equals("README.md")) {
@@ -54,27 +69,16 @@ public class GitHandlerTest {
             }
         }
         assertTrue(fileExists);
-        deleteTempDir(in.directory);
     }
 
     @Test
     public void checkIsUrlSet() {
-        Input in = this.createInput("test9", "https://github.com/andiderp/dummy.git");
-        GitHandler tested = new GitHandler(in);
-        try {
-            tested.cloneRepository();
-            assertTrue(tested.isUrlSet());
-        } catch (NotClonedException e) {
-            fail("could not clone repository");
-        } finally {
-            deleteTempDir(in.directory);
-        }
+        this.clone(tested);
+        assertTrue(tested.isUrlSet());
     }
 
     @Test
     public void checkIsUrlNotSet() {
-        Input in = this.createInput("test10", "https://github.com/andiderp/dummy.git");
-        GitHandler tested = new GitHandler(in);
         try {
             tested.cloneRepository();
             Repository repo = Git.open(in.directory).getRepository();
@@ -86,52 +90,31 @@ public class GitHandlerTest {
             fail("Could not open repository");
         } catch (NotClonedException e) {
             fail("Could not clone repository");
-        } finally {
-            deleteTempDir(in.directory);
         }
     }
 
     @Test
     public void checkPull() {
-        Input in = this.createInput("test11", "https://github.com/andiderp/dummy.git");
-        GitHandler tested = new GitHandler(in);
-        this.deleteTempDir(in.directory);
-        try {
-            tested.cloneRepository();
-        } catch (NotClonedException e) {
-            fail("Could not clone repository");
-        }
+        this.clone(tested);
         try {
             String content = FileCommands.readFileAsString(new File(in.directory, "README.md"));
             assertEquals(content, "This is a dummy repository for testing.\n");
             Git.open(in.directory).reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD^").call();
-            try {
-                tested.pull();
-            } catch (NotPulledException e) {
-                fail("Could not pull repository");
-            }
+            tested.pull();
             content = FileCommands.readFileAsString(new File(in.directory, "README.md"));
             assertEquals(content, "This is a dummy repository for testing.\n");
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (CheckoutConflictException e) {
-            e.printStackTrace();
+            fail("Could not open repository");
         } catch (GitAPIException e) {
             e.printStackTrace();
-        } finally {
-            deleteTempDir(in.directory);
+        } catch (NotPulledException e) {
+            fail("Could not pull repository");
         }
     }
 
     @Test(expected = NotPulledException.class)
     public void checkPullWithLocalCommit() throws NotPulledException {
-        Input in = this.createInput("test4", "https://github.com/andiderp/dummy.git");
-        GitHandler tested = new GitHandler(in);
-        try {
-            tested.cloneRepository();
-        } catch (NotClonedException e) {
-            fail("Could not clone repository");
-        }
+        this.clone(tested);
         try {
             Git.open(in.directory).reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD^").call();
             FileCommands.writeToFile(new File(in.directory, "README.md"), "This is a dummy repository for testing.\nLocal Change.");
@@ -143,7 +126,6 @@ public class GitHandlerTest {
             fail("Could not commit local change");
         }
         tested.pull();
-        deleteTempDir(in.directory);
     }
 
     @Test
@@ -158,17 +140,17 @@ public class GitHandlerTest {
         assertEquals("c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f", s);
     }
 
+    private void clone(GitHandler handler) {
+        try {
+            handler.cloneRepository();
+        } catch (NotClonedException e) {
+            fail("Could not clone repository");
+        }
+    }
+
     private Input createInput(String local, String remote) {
         File localFile = new File(local);
         Input.Builder inputBuilder = new Input.Builder(localFile, remote, null);
         return inputBuilder.build();
-    }
-
-    private void deleteTempDir(File location) {
-        try {
-            FileCommands.delete(location);
-        } catch (IOException e) {
-            fail("Could not delete temporary directory");
-        }
     }
 }
