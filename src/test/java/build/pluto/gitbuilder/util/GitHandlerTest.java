@@ -31,10 +31,13 @@ public class GitHandlerTest {
 
     private Input in;
     private GitHandler tested;
+    private String dummyPath;
 
     @Before
     public void init() {
-        this.in = this.createInput("test", "https://github.com/andiderp/dummy.git");
+        File dummyLocation = new File("src/test/resources/dummy");
+        this.dummyPath = "file://" + dummyLocation.getAbsolutePath();
+        this.in = this.createInput("test", this.dummyPath);
         this.tested = new GitHandler(in);
     }
 
@@ -130,13 +133,13 @@ public class GitHandlerTest {
 
     @Test
     public void checkGetHashOfRemoteHEADMaster() {
-        String s = GitHandler.getHashOfRemoteHEAD("https://github.com/andiderp/dummy.git", "master");
+        String s = GitHandler.getHashOfRemoteHEAD(this.dummyPath, "master");
         assertEquals("58ae298272e0865e51e3af36c9989667face301e", s);
     }
 
     @Test
     public void checkGetHashOfRemoteHEADFeature() {
-        String s = GitHandler.getHashOfRemoteHEAD("https://github.com/andiderp/dummy.git", "feature");
+        String s = GitHandler.getHashOfRemoteHEAD(this.dummyPath, "feature");
         assertEquals("c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f", s);
     }
 
