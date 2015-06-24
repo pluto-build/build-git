@@ -2,6 +2,7 @@ package build.pluto.gitbuilder;
 
 import build.pluto.builder.Builder;
 import build.pluto.gitbuilder.stamp.GitHashStamper;
+import build.pluto.gitbuilder.util.FileUtil;
 import build.pluto.gitbuilder.util.GitHandler;
 import build.pluto.output.None;
 import org.eclipse.jgit.api.errors.*;
@@ -34,7 +35,7 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
     protected None build(Input input) throws Throwable {
         GitHandler git = new GitHandler(input);
         this.require(input.directory, new GitHashStamper(input.url, input.branchName));
-        if (!directoryExists(input) || directoryIsEmpty(input)) {
+        if (!FileCommands.exists(input.directory) || FileUtil.directoryIsEmpty(input.directory)) {
             if (git.isUrlAccessible()) {
                 git.cloneRepository();
             } else {
@@ -57,22 +58,10 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
         List<Path> outputFiles = FileCommands.listFilesRecursive(input.directory.toPath());
         File gitDirectory = new File(input.directory, ".git");
         for (Path p : outputFiles) {
-            if (!containsFile(gitDirectory, p.toFile())) {
+            if (!FileUtil.containsFile(gitDirectory, p.toFile())) {
                 provide(p.toFile());
             }
         }
         return None.val;
-    }
-
-    public boolean directoryExists(Input input) {
-        return FileCommands.exists(input.directory);
-    }
-
-    public boolean directoryIsEmpty(Input input) {
-        return FileCommands.listFilesRecursive(input.directory.toPath()).size() == 0;
-    }
-
-    public boolean containsFile(File directory, File file) {
-        return file.getAbsolutePath().contains(directory.getName() + "/");
     }
 }
