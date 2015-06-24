@@ -1,7 +1,8 @@
-package build.pluto.gitbuilder;
+package build.pluto.gitbuilder.stamp;
 
 import java.io.File;
 
+import build.pluto.gitbuilder.util.GitHandler;
 import build.pluto.stamp.Stamper;
 import build.pluto.stamp.Stamp;
 import build.pluto.stamp.ValueStamp;

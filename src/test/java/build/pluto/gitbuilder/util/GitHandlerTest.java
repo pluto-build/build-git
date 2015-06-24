@@ -1,5 +1,9 @@
-package build.pluto.gitbuilder;
+package build.pluto.gitbuilder.util;
 
+import build.pluto.gitbuilder.Input;
+import build.pluto.gitbuilder.exception.NotClonedException;
+import build.pluto.gitbuilder.exception.NotPulledException;
+import build.pluto.gitbuilder.util.GitHandler;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;

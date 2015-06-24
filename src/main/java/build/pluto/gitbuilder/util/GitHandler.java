@@ -1,5 +1,10 @@
-package build.pluto.gitbuilder;
+package build.pluto.gitbuilder.util;
 
+import build.pluto.gitbuilder.Input;
+import build.pluto.gitbuilder.exception.NotCheckedOutException;
+import build.pluto.gitbuilder.exception.NotClonedException;
+import build.pluto.gitbuilder.exception.NotFetchedException;
+import build.pluto.gitbuilder.exception.NotPulledException;
 import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand;

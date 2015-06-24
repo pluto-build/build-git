@@ -1,6 +1,8 @@
 package build.pluto.gitbuilder;
 
 import build.pluto.builder.Builder;
+import build.pluto.gitbuilder.stamp.GitHashStamper;
+import build.pluto.gitbuilder.util.GitHandler;
 import build.pluto.output.None;
 import org.eclipse.jgit.api.errors.*;
 import org.sugarj.common.FileCommands;
