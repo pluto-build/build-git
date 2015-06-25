@@ -22,9 +22,12 @@ public class GitHashStamper implements Stamper {
 
     public Stamp stampOf(File p) {
         if (!FileCommands.exists(p)) {
-            return new ValueStamp<String>(this, null);
+            return new ValueStamp<>(this, null);
         }
         String commitHashOfHEAD = GitHandler.getHashOfRemoteHEAD(this.url, this.branch);
-        return new ValueStamp<String>(this, commitHashOfHEAD);
+        if (commitHashOfHEAD == null) {
+            commitHashOfHEAD = GitHandler.getHashOfRemoteHEAD("file://" + p.getAbsolutePath(), this.branch);
+        }
+        return new ValueStamp<>(this, commitHashOfHEAD);
     }
 }
