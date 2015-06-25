@@ -1,6 +1,7 @@
 package build.pluto.gitbuilder;
 
 import build.pluto.builder.Builder;
+import build.pluto.builder.BuilderFactory;
 import build.pluto.gitbuilder.stamp.GitHashStamper;
 import build.pluto.gitbuilder.util.FileUtil;
 import build.pluto.gitbuilder.util.GitHandler;
@@ -14,6 +15,8 @@ import java.util.List;
 
 public class GitRepositoryBuilder extends Builder<Input, None> {
 
+    public static BuilderFactory<Input, None, GitRepositoryBuilder> factory = BuilderFactory.of(GitRepositoryBuilder.class, Input.class);
+    
     public GitRepositoryBuilder(Input input) {
         super(input);
     }
