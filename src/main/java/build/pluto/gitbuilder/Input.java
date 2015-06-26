@@ -1,7 +1,7 @@
 package build.pluto.gitbuilder;
 
-import org.eclipse.jgit.api.MergeCommand;
-import org.eclipse.jgit.merge.MergeStrategy;
+import build.pluto.gitbuilder.FastForwardMode;
+import build.pluto.gitbuilder.MergeStrategy;
 
 import java.io.File;
 import java.io.Serializable;
@@ -13,7 +13,7 @@ public class Input implements Serializable {
     public final File summaryLocation;
 
     public final String branchName;
-    public final MergeCommand.FastForwardMode ffMode;
+    public final FastForwardMode ffMode;
     public final MergeStrategy mergeStrategy;
     public final boolean createMergeCommit;
     public final boolean squashCommit;
@@ -36,7 +36,7 @@ public class Input implements Serializable {
         private final File summaryLocation;
 
         private String branchName = "master";
-        private MergeCommand.FastForwardMode ffMode = MergeCommand.FastForwardMode.FF_ONLY;
+        private FastForwardMode ffMode = FastForwardMode.FF_ONLY;
         private MergeStrategy mergeStrategy = MergeStrategy.RESOLVE;
         private boolean createMergeCommit = false;
         private boolean squashCommit = false;
@@ -52,7 +52,7 @@ public class Input implements Serializable {
             return this;
         }
 
-        public Builder setFfMode(MergeCommand.FastForwardMode ffMode) {
+        public Builder setFfMode(FastForwardMode ffMode) {
             this.ffMode = ffMode;
             return this;
         }

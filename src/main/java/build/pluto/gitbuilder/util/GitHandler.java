@@ -1,6 +1,7 @@
 package build.pluto.gitbuilder.util;
 
 import build.pluto.gitbuilder.Input;
+import build.pluto.gitbuilder.FastForwardMode;
 import build.pluto.gitbuilder.exception.NotCheckedOutException;
 import build.pluto.gitbuilder.exception.NotClonedException;
 import build.pluto.gitbuilder.exception.NotFetchedException;
@@ -99,11 +100,35 @@ public class GitHandler {
             merge.include(ref);
             merge.setCommit(input.createMergeCommit);
             merge.setSquash(input.squashCommit);
-            merge.setFastForward(input.ffMode);
-            merge.setStrategy(input.mergeStrategy);
+            merge.setFastForward(getFastForwardMode());
+            merge.setStrategy(getMergeStrategy());
             return merge.call();
         } catch (GitAPIException e) {
             throw new NotMergedException();
+        }
+    }
+
+    private MergeCommand.FastForwardMode getFastForwardMode() {
+        if (input.ffMode == FastForwardMode.FF_ONLY) {
+            return MergeCommand.FastForwardMode.FF_ONLY;
+        } else if (input.ffMode == FastForwardMode.FF) {
+            return MergeCommand.FastForwardMode.FF;
+        } else {
+            return MergeCommand.FastForwardMode.NO_FF;
+        }
+    }
+
+    private org.eclipse.jgit.merge.MergeStrategy getMergeStrategy() {
+        if (input.mergeStrategy == build.pluto.gitbuilder.MergeStrategy.OURS) {
+            return org.eclipse.jgit.merge.MergeStrategy.OURS;
+        } else if (input.mergeStrategy == build.pluto.gitbuilder.MergeStrategy.RECURSIVE) {
+            return org.eclipse.jgit.merge.MergeStrategy.RECURSIVE;
+        } else if (input.mergeStrategy == build.pluto.gitbuilder.MergeStrategy.RESOLVE) {
+            return org.eclipse.jgit.merge.MergeStrategy.RESOLVE;
+        } else if (input.mergeStrategy ==build.pluto.gitbuilder.MergeStrategy.SIMPLE_TWO_WAY_IN_CORE) {
+            return org.eclipse.jgit.merge.MergeStrategy.SIMPLE_TWO_WAY_IN_CORE;
+        } else {
+            return org.eclipse.jgit.merge.MergeStrategy.THEIRS;
         }
     }
 
