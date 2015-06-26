@@ -51,7 +51,7 @@ public class GitHashStamperTest {
     @Test
     public void testRemoteIsAccessible() {
         ValueStamp s = (ValueStamp) this.tested.stampOf(directory);
-        assertEquals(s.val, "58ae298272e0865e51e3af36c9989667face301e");
+        assertEquals(s.val, "ddfa2acb09533f16792f6006316ce2744792d839");
     }
 
     @Test
@@ -66,7 +66,7 @@ public class GitHashStamperTest {
         }
         GitHashStamper stamper = new GitHashStamper("jdkjdhjhfd", "master");
         ValueStamp s = (ValueStamp) stamper.stampOf(this.directory);
-        assertEquals(s.val, "58ae298272e0865e51e3af36c9989667face301e");
+        assertEquals(s.val, "ddfa2acb09533f16792f6006316ce2744792d839");
     }
 
     private void deleteTempDirectory() {

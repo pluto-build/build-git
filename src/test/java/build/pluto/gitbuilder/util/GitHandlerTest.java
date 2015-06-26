@@ -134,7 +134,7 @@ public class GitHandlerTest {
     @Test
     public void checkGetHashOfRemoteHEADMaster() {
         String s = GitHandler.getHashOfRemoteHEAD(this.dummyPath, "master");
-        assertEquals("58ae298272e0865e51e3af36c9989667face301e", s);
+        assertEquals("ddfa2acb09533f16792f6006316ce2744792d839", s);
     }
 
     @Test
