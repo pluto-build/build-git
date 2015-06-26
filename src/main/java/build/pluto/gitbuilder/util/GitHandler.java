@@ -186,8 +186,6 @@ public class GitHandler {
                 }
             }
         } catch (GitAPIException e) {
-            //TODO:throw exception
-            e.printStackTrace();
             return null;
         }
         return null;
