@@ -45,11 +45,22 @@ public class GitHandler {
 
     public void cloneRepository() throws NotClonedException {
         try {
+            List<String> branchesToClone = new ArrayList<>();
             this.git = Git.cloneRepository()
                     .setURI(input.url)
                     .setDirectory(input.directory)
                     .setBranch(input.branchName)
+                    .setCloneSubmodules(input.cloneSubmodules)
                     .call();
+            for(String branchName : input.branchesToClone) {
+                this.git.checkout()
+                        .setCreateBranch(true)
+                        .setName(branchName)
+                        .setStartPoint("origin/" + branchName).call();
+            }
+            this.git.checkout()
+                .setName(input.branchName)
+                .call();
         } catch (GitAPIException e) {
             this.git = null;
             throw new NotClonedException();
@@ -189,5 +200,5 @@ public class GitHandler {
             return null;
         }
         return null;
-    }
+   }
 }

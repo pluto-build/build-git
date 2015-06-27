@@ -5,6 +5,8 @@ import build.pluto.gitbuilder.MergeStrategy;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Input implements Serializable {
     private static final long serialVersionUID = -1L;
@@ -13,6 +15,8 @@ public class Input implements Serializable {
     public final File summaryLocation;
 
     public final String branchName;
+    public final List<String> branchesToClone;
+    public final boolean cloneSubmodules;
     public final FastForwardMode ffMode;
     public final MergeStrategy mergeStrategy;
     public final boolean createMergeCommit;
@@ -24,6 +28,8 @@ public class Input implements Serializable {
         this.url = builder.url;
         this.summaryLocation = builder.summaryLocation;
         this.branchName = builder.branchName;
+        this.branchesToClone = builder.branchesToClone;
+        this.cloneSubmodules = builder.cloneSubmodules;
         this.ffMode = builder.ffMode;
         this.mergeStrategy = builder.mergeStrategy;
         this.createMergeCommit = builder.createMergeCommit;
@@ -36,6 +42,8 @@ public class Input implements Serializable {
         private final File summaryLocation;
 
         private String branchName = "master";
+        private List<String> branchesToClone = new ArrayList<>();
+        private boolean cloneSubmodules = false;
         private FastForwardMode ffMode = FastForwardMode.FF_ONLY;
         private MergeStrategy mergeStrategy = MergeStrategy.RESOLVE;
         private boolean createMergeCommit = false;
@@ -49,6 +57,16 @@ public class Input implements Serializable {
 
         public Builder setBranchName(String branchName) {
             this.branchName = branchName;
+            return this;
+        }
+
+        public Builder addBranchToClone(String branchName) {
+            this.branchesToClone.add(branchName);
+            return this;
+        }
+
+        public Builder setCloneSubmodules(boolean cloneSubmodules) {
+            this.cloneSubmodules = cloneSubmodules;
             return this;
         }
 
