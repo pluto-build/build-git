@@ -1,24 +1,27 @@
 package build.pluto.gitbuilder.util;
 
-import build.pluto.gitbuilder.Input;
-import build.pluto.gitbuilder.FastForwardMode;
 import build.pluto.gitbuilder.exception.NotCheckedOutException;
 import build.pluto.gitbuilder.exception.NotClonedException;
 import build.pluto.gitbuilder.exception.NotFetchedException;
 import build.pluto.gitbuilder.exception.NotPulledException;
+import build.pluto.gitbuilder.FastForwardMode;
+import build.pluto.gitbuilder.Input;
+
+import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.MergeResult;
-import org.eclipse.jgit.api.errors.*;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.FetchResult;
-import org.eclipse.jgit.lib.ObjectId;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 public class GitHandler {
