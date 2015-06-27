@@ -2,6 +2,7 @@ package build.pluto.gitbuilder.util;
 
 import build.pluto.gitbuilder.Input;
 import build.pluto.gitbuilder.exception.NotClonedException;
+import build.pluto.gitbuilder.exception.NotCheckedOutException;
 import build.pluto.gitbuilder.exception.NotPulledException;
 import build.pluto.gitbuilder.util.GitHandler;
 
@@ -23,6 +24,7 @@ import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.sugarj.common.FileCommands;
@@ -132,6 +134,24 @@ public class GitHandlerTest {
     }
 
     @Test
+    public void testCheckout() {
+       this.clone(tested);
+       Exception ex = null;
+       try {
+           tested.checkout("feature");
+       } catch (NotCheckedOutException e ) {
+           ex = e;
+       }
+       assertNull(ex);
+    }
+
+    @Test(expected = NotCheckedOutException.class)
+    public void testCheckoutFailed() throws NotCheckedOutException {
+        this.clone(tested);
+        tested.checkout("master2");
+    }
+
+    @Test
     public void checkGetHashOfRemoteHEADMaster() {
         String s = GitHandler.getHashOfRemoteHEAD(this.dummyPath, "master");
         assertEquals("ddfa2acb09533f16792f6006316ce2744792d839", s);
@@ -154,6 +174,7 @@ public class GitHandlerTest {
     private Input createInput(String local, String remote) {
         File localFile = new File(local);
         Input.Builder inputBuilder = new Input.Builder(localFile, remote, null);
+        inputBuilder.addBranchToClone("feature");
         return inputBuilder.build();
     }
 }
