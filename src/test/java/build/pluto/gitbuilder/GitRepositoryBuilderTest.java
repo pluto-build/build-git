@@ -27,26 +27,11 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
 
     @ScopedPath("")
     private File directory;
-    private String branch;
     private File remoteLocation;
 
     @Before
     public void init() {
-        this.branch = "master";
         this.remoteLocation = new File("src/test/resources/dummy");
-    }
-
-    private TrackingBuildManager build() throws IOException {
-        File binaryPath = null;
-        TrackingBuildManager manager = new TrackingBuildManager();
-        File summaryLocation = new File(directory, "temp");
-        Input.Builder inputBuilder = new Input.Builder(directory, "file://" + remoteLocation.getAbsolutePath(), summaryLocation);
-        inputBuilder.setBranchName(branch);
-        inputBuilder.addBranchToClone("master2");
-        inputBuilder.addBranchToClone("feature");
-        Input input = inputBuilder.build();
-        manager.require(GitRepositoryBuilder.factory, input);
-        return manager;
     }
 
     @Test
@@ -85,6 +70,19 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
         build();
     }
 
+    private TrackingBuildManager build() throws IOException {
+        File binaryPath = null;
+        TrackingBuildManager manager = new TrackingBuildManager();
+        File summaryLocation = new File(directory, "temp");
+        Input.Builder inputBuilder = new Input.Builder(directory, "file://" + remoteLocation.getAbsolutePath(), summaryLocation);
+        inputBuilder.setBranchName("master");
+        inputBuilder.addBranchToClone("master2");
+        inputBuilder.addBranchToClone("feature");
+        Input input = inputBuilder.build();
+        manager.require(GitRepositoryBuilder.factory, input);
+        return manager;
+    }
+
     private void createCommitOnRemote() {
         File newFile = new File(remoteLocation, "tempChange.txt");
         try {
@@ -108,6 +106,7 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
             fail("Could not delete temporary commit");
         }
     }
+
     private void assertCorrectHead(String hash) {
         String commitHash = GitHandler.getHashOfRemoteHEAD("file://" + directory.getAbsolutePath(), "master");
         assertEquals(hash, commitHash);

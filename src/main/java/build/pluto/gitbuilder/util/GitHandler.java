@@ -108,6 +108,18 @@ public class GitHandler {
         }
     }
 
+    private String getRemoteOfUrl() {
+        StoredConfig config = git.getRepository().getConfig();
+        Set<String> remotes = config.getSubsections("remote");
+        for (String remote : remotes) {
+            String url = config.getString("remote", remote, "url");
+            if(url.equals(input.url)) {
+                return remote;
+            }
+        }
+        return null;
+    }
+
     private MergeResult merge(Ref ref) throws NotMergedException {
         try {
             MergeCommand merge = git.merge();
@@ -144,18 +156,6 @@ public class GitHandler {
         } else {
             return org.eclipse.jgit.merge.MergeStrategy.THEIRS;
         }
-    }
-
-    private String getRemoteOfUrl() {
-        StoredConfig config = git.getRepository().getConfig();
-        Set<String> remotes = config.getSubsections("remote");
-        for (String remote : remotes) {
-            String url = config.getString("remote", remote, "url");
-            if(url.equals(input.url)) {
-                return remote;
-            }
-        }
-        return null;
     }
 
     public boolean isUrlSet() {
