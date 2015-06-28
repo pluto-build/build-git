@@ -66,7 +66,7 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
 
     @Test(expected = RequiredBuilderFailed.class)
     public void testRemoteNotAccessible() throws IOException {
-        remoteLocation = new File("hkhhej");
+        remoteLocation = new File("deadlink");
         build();
     }
 
