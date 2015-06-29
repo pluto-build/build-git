@@ -8,8 +8,9 @@ import build.pluto.test.build.TrackingBuildManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import org.junit.Before;
 import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.sugarj.common.FileCommands;
 
@@ -21,7 +22,6 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-import org.junit.Test;
 
 public class GitRepositoryBuilderTest extends ScopedBuildTest {
 
@@ -83,6 +83,11 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
         return manager;
     }
 
+    private void assertCorrectHead(String hash) {
+        String commitHash = GitHandler.getHashOfRemoteHEAD("file://" + directory.getAbsolutePath(), "master");
+        assertEquals(hash, commitHash);
+    }
+
     private void createCommitOnRemote() {
         File newFile = new File(remoteLocation, "tempChange.txt");
         try {
@@ -105,10 +110,5 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
         } catch (GitAPIException e) {
             fail("Could not delete temporary commit");
         }
-    }
-
-    private void assertCorrectHead(String hash) {
-        String commitHash = GitHandler.getHashOfRemoteHEAD("file://" + directory.getAbsolutePath(), "master");
-        assertEquals(hash, commitHash);
     }
 }
