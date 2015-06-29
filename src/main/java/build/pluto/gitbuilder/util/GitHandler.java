@@ -14,6 +14,7 @@ import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.FetchResult;
 
@@ -189,6 +190,16 @@ public class GitHandler {
         return true;
     }
 
+    public static void resetRepoToCommit(File directory, String commitHash) {
+        try {
+            Git.open(directory).reset().setMode(ResetCommand.ResetType.HARD).setRef(commitHash).call();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (GitAPIException e ) {
+            e.printStackTrace();
+
+        }
+    }
     public static String getHashOfRemoteHEAD(String url, String branch) {
         try {
             Collection<Ref> refs = Git.lsRemoteRepository().setRemote(url).setHeads(true).setTags(false).call();

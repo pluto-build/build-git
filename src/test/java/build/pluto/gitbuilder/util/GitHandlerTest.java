@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
@@ -104,14 +103,12 @@ public class GitHandlerTest {
         try {
             String content = FileCommands.readFileAsString(new File(in.directory, "README.md"));
             assertEquals(content, "This is a dummy repository for testing.\n");
-            Git.open(in.directory).reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD^").call();
+            GitHandler.resetRepoToCommit(in.directory, "HEAD^");
             tested.pull();
             content = FileCommands.readFileAsString(new File(in.directory, "README.md"));
             assertEquals(content, "This is a dummy repository for testing.\n");
         } catch (IOException e) {
-            fail("Could not open repository");
-        } catch (GitAPIException e) {
-            e.printStackTrace();
+            fail("Could not read file");
         } catch (NotPulledException e) {
             fail("Could not pull repository");
         }
@@ -121,7 +118,7 @@ public class GitHandlerTest {
     public void checkPullWithLocalCommit() throws NotPulledException {
         this.clone(tested);
         try {
-            Git.open(in.directory).reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD^").call();
+            GitHandler.resetRepoToCommit(in.directory, "HEAD^");
             FileCommands.writeToFile(new File(in.directory, "README.md"), "This is a dummy repository for testing.\nLocal Change.");
             Git.open(in.directory).add().addFilepattern("README.md").call();
             Git.open(in.directory).commit().setMessage("local changes").call();

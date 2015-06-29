@@ -19,9 +19,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-
 
 public class GitRepositoryBuilderTest extends ScopedBuildTest {
 
@@ -103,12 +101,6 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
     }
 
     private void deleteTempCommitOnRemote() {
-        try {
-            Git.open(remoteLocation).reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD^").call();
-        } catch (IOException e) {
-            fail("Could not open remote repository");
-        } catch (GitAPIException e) {
-            fail("Could not delete temporary commit");
-        }
+        GitHandler.resetRepoToCommit(remoteLocation, "HEAD^");
     }
 }
