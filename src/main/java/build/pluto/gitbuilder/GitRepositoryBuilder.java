@@ -2,7 +2,7 @@ package build.pluto.gitbuilder;
 
 import build.pluto.builder.Builder;
 import build.pluto.builder.BuilderFactory;
-import build.pluto.gitbuilder.stamp.GitHashStamper;
+import build.pluto.gitbuilder.stamp.RemoteHashStamper;
 import build.pluto.gitbuilder.util.FileUtil;
 import build.pluto.gitbuilder.util.GitHandler;
 import build.pluto.output.None;
@@ -37,7 +37,7 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
     @Override
     protected None build(Input input) throws Throwable {
         GitHandler git = new GitHandler(input);
-        this.require(input.directory, new GitHashStamper(input.url, input.branchName));
+        this.require(input.directory, new RemoteHashStamper(input.url, input.branchName));
         if (!FileCommands.exists(input.directory) || FileUtil.directoryIsEmpty(input.directory)) {
             if (git.isUrlAccessible()) {
                 git.cloneRepository();

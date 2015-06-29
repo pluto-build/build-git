@@ -98,7 +98,7 @@ public class GitHandlerTest {
     }
 
     @Test
-    public void checkPull() {
+    public void checkPull() throws InvalidRefNameException {
         this.clone(tested);
         try {
             String content = FileCommands.readFileAsString(new File(in.directory, "README.md"));

@@ -9,13 +9,13 @@ import build.pluto.stamp.ValueStamp;
 
 import org.sugarj.common.FileCommands;
 
-public class GitHashStamper implements Stamper {
+public class RemoteHashStamper implements Stamper {
     public static final long serialVersionUID = 1234L;
 
     public final String url;
     public final String branch;
 
-    public GitHashStamper(String url, String branch) {
+    public RemoteHashStamper(String url, String branch) {
         this.url = url;
         this.branch = branch;
     }

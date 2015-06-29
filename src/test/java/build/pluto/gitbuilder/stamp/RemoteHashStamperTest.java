@@ -17,9 +17,9 @@ import org.junit.Before;
 
 import org.sugarj.common.FileCommands;
 
-public class GitHashStamperTest {
+public class RemoteHashStamperTest {
 
-    private GitHashStamper tested;
+    private RemoteHashStamper tested;
     private File directory;
     private String dummyPath;
 
@@ -33,7 +33,7 @@ public class GitHashStamperTest {
             fail("Could not create directory");
         }
         this.dummyPath = "file://" + remoteDirectory.getAbsolutePath();
-        this.tested = new GitHashStamper(this.dummyPath, "master");
+        this.tested = new RemoteHashStamper(this.dummyPath, "master");
     }
 
     @After
@@ -64,7 +64,7 @@ public class GitHashStamperTest {
         } catch (NotClonedException e) {
             fail("Could not clone directory");
         }
-        GitHashStamper stamper = new GitHashStamper("jdkjdhjhfd", "master");
+        RemoteHashStamper stamper = new RemoteHashStamper("jdkjdhjhfd", "master");
         ValueStamp s = (ValueStamp) stamper.stampOf(this.directory);
         assertEquals(s.val, "ddfa2acb09533f16792f6006316ce2744792d839");
     }
