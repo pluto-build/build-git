@@ -5,21 +5,18 @@ import build.pluto.gitbuilder.util.GitHandler;
 import build.pluto.test.build.ScopedBuildTest;
 import build.pluto.test.build.ScopedPath;
 import build.pluto.test.build.TrackingBuildManager;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import org.junit.After;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.sugarj.common.FileCommands;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRefNameException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class GitRepositoryBuilderTest extends ScopedBuildTest {
 

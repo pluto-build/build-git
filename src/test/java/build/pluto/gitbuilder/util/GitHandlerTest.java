@@ -1,32 +1,24 @@
 package build.pluto.gitbuilder.util;
 
 import build.pluto.gitbuilder.Input;
-import build.pluto.gitbuilder.exception.NotClonedException;
 import build.pluto.gitbuilder.exception.NotCheckedOutException;
+import build.pluto.gitbuilder.exception.NotClonedException;
 import build.pluto.gitbuilder.exception.NotPulledException;
-import build.pluto.gitbuilder.util.GitHandler;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRefNameException;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.sugarj.common.FileCommands;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.CheckoutConflictException;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.StoredConfig;
-
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import org.sugarj.common.FileCommands;
+import static org.junit.Assert.*;
 
 public class GitHandlerTest {
 

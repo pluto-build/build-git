@@ -1,13 +1,12 @@
 package build.pluto.gitbuilder.stamp;
 
-import java.io.File;
-
 import build.pluto.gitbuilder.util.GitHandler;
-import build.pluto.stamp.Stamper;
 import build.pluto.stamp.Stamp;
+import build.pluto.stamp.Stamper;
 import build.pluto.stamp.ValueStamp;
-
 import org.sugarj.common.FileCommands;
+
+import java.io.File;
 
 public class RemoteHashStamper implements Stamper {
     public static final long serialVersionUID = 1234L;

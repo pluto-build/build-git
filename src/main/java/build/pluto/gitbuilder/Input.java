@@ -1,8 +1,5 @@
 package build.pluto.gitbuilder;
 
-import build.pluto.gitbuilder.FastForwardMode;
-import build.pluto.gitbuilder.MergeStrategy;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;

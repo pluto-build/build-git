@@ -1,21 +1,18 @@
 package build.pluto.gitbuilder.stamp;
 
-import build.pluto.gitbuilder.exception.NotClonedException;
 import build.pluto.gitbuilder.Input;
+import build.pluto.gitbuilder.exception.NotClonedException;
 import build.pluto.gitbuilder.util.GitHandler;
 import build.pluto.stamp.ValueStamp;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.sugarj.common.FileCommands;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import org.junit.Test;
-import org.junit.After;
-import org.junit.Before;
-
-import org.sugarj.common.FileCommands;
+import static org.junit.Assert.*;
 
 public class RemoteHashStamperTest {
 

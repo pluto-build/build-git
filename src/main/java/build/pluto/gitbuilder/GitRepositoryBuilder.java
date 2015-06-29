@@ -6,7 +6,7 @@ import build.pluto.gitbuilder.stamp.RemoteHashStamper;
 import build.pluto.gitbuilder.util.FileUtil;
 import build.pluto.gitbuilder.util.GitHandler;
 import build.pluto.output.None;
-import org.eclipse.jgit.api.errors.*;
+import org.eclipse.jgit.api.errors.TransportException;
 import org.sugarj.common.FileCommands;
 
 import java.io.File;
