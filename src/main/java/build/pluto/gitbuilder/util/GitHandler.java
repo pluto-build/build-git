@@ -190,14 +190,13 @@ public class GitHandler {
         return true;
     }
 
-    public static void resetRepoToCommit(File directory, String commitHash) {
+    public static void resetRepoToCommit(File directory, String commitHash) throws InvalidRefNameException {
         try {
             Git.open(directory).reset().setMode(ResetCommand.ResetType.HARD).setRef(commitHash).call();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (GitAPIException e ) {
-            e.printStackTrace();
-
+        } catch (GitAPIException e) {
+            throw new InvalidRefNameException("Ref  " + commitHash + " does not exist");
         }
     }
     public static String getHashOfRemoteHEAD(String url, String branch) {

@@ -33,7 +33,7 @@ public class RemoteHashStamperTest {
             fail("Could not create directory");
         }
         this.dummyPath = "file://" + remoteDirectory.getAbsolutePath();
-        this.tested = new RemoteHashStamper(this.dummyPath, "master");
+        this.tested = new RemoteHashStamper(this.dummyPath, "master", null);
     }
 
     @After
@@ -64,7 +64,7 @@ public class RemoteHashStamperTest {
         } catch (NotClonedException e) {
             fail("Could not clone directory");
         }
-        RemoteHashStamper stamper = new RemoteHashStamper("jdkjdhjhfd", "master");
+        RemoteHashStamper stamper = new RemoteHashStamper("jdkjdhjhfd", "master", null);
         ValueStamp s = (ValueStamp) stamper.stampOf(this.directory);
         assertEquals(s.val, "ddfa2acb09533f16792f6006316ce2744792d839");
     }

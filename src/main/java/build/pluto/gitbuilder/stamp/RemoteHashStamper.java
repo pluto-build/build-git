@@ -14,10 +14,12 @@ public class RemoteHashStamper implements Stamper {
 
     public final String url;
     public final String branch;
+    public final String commitBound;
 
-    public RemoteHashStamper(String url, String branch) {
+    public RemoteHashStamper(String url, String branch, String commitBound) {
         this.url = url;
         this.branch = branch;
+        this.commitBound = commitBound;
     }
 
     public Stamp stampOf(File p) {
@@ -28,6 +30,13 @@ public class RemoteHashStamper implements Stamper {
         if (commitHashOfHEAD == null) {
             commitHashOfHEAD = GitHandler.getHashOfRemoteHEAD("file://" + p.getAbsolutePath(), this.branch);
         }
+        if(commitBoundDefined() && !commitHashOfHEAD.equals(this.commitBound)) {
+            return new ValueStamp<>(this, this.commitBound);
+        }
         return new ValueStamp<>(this, commitHashOfHEAD);
+    }
+
+    private boolean commitBoundDefined() {
+        return this.commitBound != null;
     }
 }

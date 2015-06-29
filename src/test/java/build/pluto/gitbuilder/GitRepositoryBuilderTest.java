@@ -16,20 +16,22 @@ import org.sugarj.common.FileCommands;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRefNameException;
 
 public class GitRepositoryBuilderTest extends ScopedBuildTest {
 
     @ScopedPath("")
     private File directory;
     private File remoteLocation;
+    private String commitBound;
 
     @Before
     public void init() {
         this.remoteLocation = new File("src/test/resources/dummy");
+        this.commitBound = null;
     }
 
     @Test
@@ -53,7 +55,7 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
     }
 
     @Test
-    public void testNeedToPull() throws IOException {
+    public void testNeedToPull() throws IOException, InvalidRefNameException {
         build();
         createCommitOnRemote();
         String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD("file://" + remoteLocation.getAbsolutePath(), "master");
@@ -68,6 +70,21 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
         build();
     }
 
+    @Test
+    public void testCommitBoundCurrentHEADAfterClone() throws IOException {
+        this.commitBound = "99417aa270f38d6a7d5aef584570653f58eef14b";
+        build();
+        assertCorrectHead(this.commitBound);
+    }
+
+    @Test
+    public void testCommitBoundCurrentHEADAfterPull() throws IOException {
+        this.commitBound = "99417aa270f38d6a7d5aef584570653f58eef14b";
+        build();
+        build();
+        assertCorrectHead(this.commitBound);
+    }
+
     private TrackingBuildManager build() throws IOException {
         File binaryPath = null;
         TrackingBuildManager manager = new TrackingBuildManager();
@@ -76,6 +93,7 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
         inputBuilder.setBranchName("master");
         inputBuilder.addBranchToClone("master2");
         inputBuilder.addBranchToClone("feature");
+        inputBuilder.setCommitBound(this.commitBound);
         Input input = inputBuilder.build();
         manager.require(GitRepositoryBuilder.factory, input);
         return manager;
@@ -100,7 +118,7 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
         }
     }
 
-    private void deleteTempCommitOnRemote() {
-        GitHandler.resetRepoToCommit(remoteLocation, "HEAD^");
+    private void deleteTempCommitOnRemote() throws InvalidRefNameException {
+        GitHandler.resetRepoToCommit(remoteLocation, "ddfa2acb09533f16792f6006316ce2744792d839");
     }
 }
