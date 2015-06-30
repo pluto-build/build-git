@@ -1,6 +1,9 @@
 package build.pluto.gitbuilder;
 
 import build.pluto.builder.RequiredBuilderFailed;
+import build.pluto.gitbuilder.bound.CommitHashAndTagBound;
+import build.pluto.gitbuilder.bound.BranchBound;
+import build.pluto.gitbuilder.bound.UpdateBound;
 import build.pluto.gitbuilder.util.GitHandler;
 import build.pluto.test.build.ScopedBuildTest;
 import build.pluto.test.build.ScopedPath;
@@ -23,12 +26,12 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
     @ScopedPath("")
     private File directory;
     private File remoteLocation;
-    private String commitBound;
+    private UpdateBound bound;
 
     @Before
     public void init() {
         this.remoteLocation = new File("src/test/resources/dummy");
-        this.commitBound = null;
+        this.bound = null;
     }
 
     @Test
@@ -69,17 +72,49 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
 
     @Test
     public void testCommitBoundCurrentHEADAfterClone() throws IOException {
-        this.commitBound = "99417aa270f38d6a7d5aef584570653f58eef14b";
+        String commitHash = "99417aa270f38d6a7d5aef584570653f58eef14b";
+        this.bound = new CommitHashAndTagBound(commitHash);
         build();
-        assertCorrectHead(this.commitBound);
+        assertCorrectHead(commitHash);
     }
 
     @Test
     public void testCommitBoundCurrentHEADAfterPull() throws IOException {
-        this.commitBound = "99417aa270f38d6a7d5aef584570653f58eef14b";
+        String commitHash = "99417aa270f38d6a7d5aef584570653f58eef14b";
+        this.bound = new CommitHashAndTagBound(commitHash);
         build();
         build();
-        assertCorrectHead(this.commitBound);
+        assertCorrectHead(commitHash);
+    }
+
+    @Test
+    public void testTagBoundCurrentHEADAfterClone() throws IOException {
+        this.bound = new CommitHashAndTagBound("v0.1");
+        build();
+        assertCorrectHead("3d8913c40c2387488172368a5cf9cf5eb64fed88");
+    }
+
+    @Test
+    public void testTagBoundCurrentHEADAfterPull() throws IOException {
+        this.bound = new CommitHashAndTagBound("v0.1");
+        build();
+        build();
+        assertCorrectHead("3d8913c40c2387488172368a5cf9cf5eb64fed88");
+    }
+
+    @Test
+    public void testBranchBoundCurrentHEADAfterClone() throws IOException {
+        this.bound = new BranchBound("master2", "file://"+ this.remoteLocation.getAbsolutePath());
+        build();
+        assertCorrectHead("99417aa270f38d6a7d5aef584570653f58eef14b");
+    }
+
+    @Test
+    public void testBranchBoundCurrentHEADAfterPull() throws IOException {
+        this.bound = new BranchBound("master2", "file://"+ this.remoteLocation.getAbsolutePath());
+        build();
+        build();
+        assertCorrectHead("99417aa270f38d6a7d5aef584570653f58eef14b");
     }
 
     private TrackingBuildManager build() throws IOException {
@@ -87,10 +122,9 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
         TrackingBuildManager manager = new TrackingBuildManager();
         File summaryLocation = new File(directory, "temp");
         Input.Builder inputBuilder = new Input.Builder(directory, "file://" + remoteLocation.getAbsolutePath(), summaryLocation);
-        inputBuilder.setBranchName("master");
         inputBuilder.addBranchToClone("master2");
         inputBuilder.addBranchToClone("feature");
-        inputBuilder.setCommitBound(this.commitBound);
+        inputBuilder.setBound(this.bound);
         Input input = inputBuilder.build();
         manager.require(GitRepositoryBuilder.factory, input);
         return manager;

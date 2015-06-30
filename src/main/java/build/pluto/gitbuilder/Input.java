@@ -1,5 +1,7 @@
 package build.pluto.gitbuilder;
 
+import build.pluto.gitbuilder.bound.UpdateBound;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ public class Input implements Serializable {
     public final MergeStrategy mergeStrategy;
     public final boolean createMergeCommit;
     public final boolean squashCommit;
-    public final String commitBound;
+    public final UpdateBound bound;
 
 
     private Input(Builder builder) {
@@ -32,7 +34,7 @@ public class Input implements Serializable {
         this.mergeStrategy = builder.mergeStrategy;
         this.createMergeCommit = builder.createMergeCommit;
         this.squashCommit = builder.squashCommit;
-        this.commitBound = builder.commitBound;
+        this.bound = builder.bound;
     }
 
     public static class Builder {
@@ -47,7 +49,7 @@ public class Input implements Serializable {
         private MergeStrategy mergeStrategy = MergeStrategy.RESOLVE;
         private boolean createMergeCommit = false;
         private boolean squashCommit = false;
-        private String commitBound = null;
+        private UpdateBound bound = null;
 
         public Builder(File directory, String url, File summaryLocation) {
             this.directory = directory == null ? new File(".") : directory;
@@ -90,8 +92,8 @@ public class Input implements Serializable {
             return this;
         }
 
-        public Builder setCommitBound(String hash) {
-            this.commitBound = hash;
+        public Builder setBound(UpdateBound bound) {
+            this.bound = bound;
             return this;
         }
 

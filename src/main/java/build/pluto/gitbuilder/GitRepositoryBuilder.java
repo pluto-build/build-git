@@ -37,12 +37,12 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
     @Override
     protected None build(Input input) throws Throwable {
         GitHandler git = new GitHandler(input);
-        this.require(input.directory, new RemoteHashStamper(input.url, input.branchName, input.commitBound));
+        this.require(input.directory, new RemoteHashStamper(input.url, input.branchName, input.bound));
         if (!FileCommands.exists(input.directory) || FileUtil.directoryIsEmpty(input.directory)) {
             if (git.isUrlAccessible()) {
                 git.cloneRepository();
-                if(input.commitBound != null) {
-                    GitHandler.resetRepoToCommit(input.directory, input.commitBound);
+                if(input.bound != null) {
+                    GitHandler.resetRepoToCommit(input.directory, input.bound.getBoundHash());
                 }
             } else {
                 throw new TransportException(input.url + " can not be accessed");

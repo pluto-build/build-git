@@ -191,11 +191,11 @@ public class GitHandler {
         try {
             Git.open(directory).reset().setMode(ResetCommand.ResetType.HARD).setRef(commitHash).call();
         } catch (IOException e) {
-            e.printStackTrace();
         } catch (GitAPIException e) {
             throw new InvalidRefNameException("Ref  " + commitHash + " does not exist");
         }
     }
+
     public static String getHashOfRemoteHEAD(String url, String branch) {
         try {
             Collection<Ref> refs = Git.lsRemoteRepository().setRemote(url).setHeads(true).setTags(false).call();

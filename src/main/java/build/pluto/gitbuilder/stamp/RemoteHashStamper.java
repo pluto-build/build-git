@@ -1,6 +1,7 @@
 package build.pluto.gitbuilder.stamp;
 
 import build.pluto.gitbuilder.util.GitHandler;
+import build.pluto.gitbuilder.bound.UpdateBound;
 import build.pluto.stamp.Stamp;
 import build.pluto.stamp.Stamper;
 import build.pluto.stamp.ValueStamp;
@@ -13,12 +14,12 @@ public class RemoteHashStamper implements Stamper {
 
     public final String url;
     public final String branch;
-    public final String commitBound;
+    public final UpdateBound bound;
 
-    public RemoteHashStamper(String url, String branch, String commitBound) {
+    public RemoteHashStamper(String url, String branch, UpdateBound bound) {
         this.url = url;
         this.branch = branch;
-        this.commitBound = commitBound;
+        this.bound = bound;
     }
 
     public Stamp stampOf(File p) {
@@ -29,13 +30,13 @@ public class RemoteHashStamper implements Stamper {
         if (commitHashOfHEAD == null) {
             commitHashOfHEAD = GitHandler.getHashOfRemoteHEAD("file://" + p.getAbsolutePath(), this.branch);
         }
-        if(commitBoundDefined() && !commitHashOfHEAD.equals(this.commitBound)) {
-            return new ValueStamp<>(this, this.commitBound);
+        if(boundDefined() && bound.reachedBound(commitHashOfHEAD)) {
+            return new ValueStamp<>(this, this.bound.getBoundHash());
         }
         return new ValueStamp<>(this, commitHashOfHEAD);
     }
 
-    private boolean commitBoundDefined() {
-        return this.commitBound != null;
+    private boolean boundDefined() {
+        return this.bound != null;
     }
 }
