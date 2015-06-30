@@ -220,5 +220,5 @@ public class GitHandler {
             return null;
         }
         return null;
-   }
+    }
 }
