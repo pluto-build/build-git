@@ -49,11 +49,8 @@ public class GitRepositoryBuilder extends Builder<Input, None> {
             }
         } else {
             if (GitHandler.isRepo(input.directory) && git.isUrlSet()) {
-                if (git.isUrlAccessible()) {
-                    git.pull();
-                } else {
-                    //do nothing
-                }
+                git.checkout(input.bound.getBound());
+                git.pull();
             } else {
                 throw new IllegalArgumentException(input.directory.toString() + " is not empty and does contains other data than the repository");
             }

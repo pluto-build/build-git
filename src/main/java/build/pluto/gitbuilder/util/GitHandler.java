@@ -69,10 +69,10 @@ public class GitHandler {
         }
     }
 
-    public void checkout(String branchName) throws NotCheckedOutException {
+    public void checkout(String hash) throws NotCheckedOutException {
         try {
             git.checkout()
-               .setName(branchName)
+               .setName(hash)
                .call();
         } catch (GitAPIException e) {
             throw new NotCheckedOutException();
