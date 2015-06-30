@@ -2,6 +2,9 @@ package build.pluto.gitbuilder.util;
 
 import build.pluto.gitbuilder.FastForwardMode;
 import build.pluto.gitbuilder.Input;
+import build.pluto.gitbuilder.bound.UpdateBound;
+import build.pluto.gitbuilder.bound.CommitHashBound;
+import build.pluto.gitbuilder.bound.BranchBound;
 import build.pluto.gitbuilder.exception.NotCheckedOutException;
 import build.pluto.gitbuilder.exception.NotClonedException;
 import build.pluto.gitbuilder.exception.NotFetchedException;
@@ -50,7 +53,6 @@ public class GitHandler {
             this.git = Git.cloneRepository()
                     .setURI(input.url)
                     .setDirectory(input.directory)
-                    .setBranch(input.branchName)
                     .setCloneSubmodules(input.cloneSubmodules)
                     .call();
             for(String branchName : input.branchesToClone) {
@@ -59,11 +61,10 @@ public class GitHandler {
                         .setName(branchName)
                         .setStartPoint("origin/" + branchName).call();
             }
-            this.git.checkout()
-                .setName(input.branchName)
-                .call();
+            this.git.checkout().setName("master").call();
         } catch (GitAPIException e) {
             this.git = null;
+            e.printStackTrace();
             throw new NotClonedException();
         }
     }
@@ -197,11 +198,20 @@ public class GitHandler {
     }
 
     public static String getHashOfRemoteHEAD(String url, String branch) {
+        BranchBound bound = new BranchBound(url, branch);
+        return getHashOfBound(url, bound);
+    }
+
+    public static String getHashOfBound(String url, UpdateBound bound) {
+        if (bound instanceof CommitHashBound) {
+            return bound.getBoundHash();
+        }
+        String refName = bound.getBound();
         try {
-            Collection<Ref> refs = Git.lsRemoteRepository().setRemote(url).setHeads(true).setTags(false).call();
+            Collection<Ref> refs = Git.lsRemoteRepository().setRemote(url).setHeads(true).setTags(true).call();
             for (Ref ref : refs) {
-                boolean isRefOfBranch = ref.getName().contains(branch);
-                if (isRefOfBranch) {
+                boolean isCorrectRef = ref.getName().contains(refName);
+                if (isCorrectRef) {
                     ObjectId objectId = ref.getObjectId();
                     return ObjectId.toString(objectId);
                 }

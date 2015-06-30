@@ -102,6 +102,7 @@ public class GitHandlerTest {
         } catch (IOException e) {
             fail("Could not read file");
         } catch (NotPulledException e) {
+            e.printStackTrace();
             fail("Could not pull repository");
         }
     }

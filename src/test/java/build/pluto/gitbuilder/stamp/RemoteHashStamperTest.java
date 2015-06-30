@@ -1,6 +1,7 @@
 package build.pluto.gitbuilder.stamp;
 
 import build.pluto.gitbuilder.Input;
+import build.pluto.gitbuilder.bound.BranchBound;
 import build.pluto.gitbuilder.exception.NotClonedException;
 import build.pluto.gitbuilder.util.GitHandler;
 import build.pluto.stamp.ValueStamp;
@@ -30,7 +31,8 @@ public class RemoteHashStamperTest {
             fail("Could not create directory");
         }
         this.dummyPath = "file://" + remoteDirectory.getAbsolutePath();
-        this.tested = new RemoteHashStamper(this.dummyPath, "master", null);
+        BranchBound bound = new BranchBound(this.dummyPath, "master");
+        this.tested = new RemoteHashStamper(this.dummyPath, bound);
     }
 
     @After
@@ -61,9 +63,10 @@ public class RemoteHashStamperTest {
         } catch (NotClonedException e) {
             fail("Could not clone directory");
         }
-        RemoteHashStamper stamper = new RemoteHashStamper("jdkjdhjhfd", "master", null);
+        BranchBound bound = new BranchBound(this.dummyPath, "master");
+        RemoteHashStamper stamper = new RemoteHashStamper("jdkjdhjhfd", bound);
         ValueStamp s = (ValueStamp) stamper.stampOf(this.directory);
-        assertEquals(s.val, "ddfa2acb09533f16792f6006316ce2744792d839");
+        assertEquals("ddfa2acb09533f16792f6006316ce2744792d839", s.val);
     }
 
     private void deleteTempDirectory() {

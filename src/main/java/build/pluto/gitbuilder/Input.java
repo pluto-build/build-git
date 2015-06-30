@@ -1,6 +1,7 @@
 package build.pluto.gitbuilder;
 
 import build.pluto.gitbuilder.bound.UpdateBound;
+import build.pluto.gitbuilder.bound.BranchBound;
 
 import java.io.File;
 import java.io.Serializable;
@@ -13,7 +14,6 @@ public class Input implements Serializable {
     public final String url;
     public final File summaryLocation;
 
-    public final String branchName;
     public final List<String> branchesToClone;
     public final boolean cloneSubmodules;
     public final FastForwardMode ffMode;
@@ -27,7 +27,6 @@ public class Input implements Serializable {
         this.directory = builder.directory;
         this.url = builder.url;
         this.summaryLocation = builder.summaryLocation;
-        this.branchName = builder.branchName;
         this.branchesToClone = builder.branchesToClone;
         this.cloneSubmodules = builder.cloneSubmodules;
         this.ffMode = builder.ffMode;
@@ -42,7 +41,6 @@ public class Input implements Serializable {
         private final String url;
         private final File summaryLocation;
 
-        private String branchName = "master";
         private List<String> branchesToClone = new ArrayList<>();
         private boolean cloneSubmodules = false;
         private FastForwardMode ffMode = FastForwardMode.FF_ONLY;
@@ -55,11 +53,7 @@ public class Input implements Serializable {
             this.directory = directory == null ? new File(".") : directory;
             this.url = url;
             this.summaryLocation = summaryLocation == null ? new File(".") : summaryLocation;
-        }
-
-        public Builder setBranchName(String branchName) {
-            this.branchName = branchName;
-            return this;
+            this.bound = new BranchBound(url, "master");
         }
 
         public Builder addBranchToClone(String branchName) {

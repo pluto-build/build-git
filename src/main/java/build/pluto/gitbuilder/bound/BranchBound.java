@@ -8,9 +8,13 @@ public class BranchBound implements UpdateBound {
     private final String branchName;
     private final String remote;
     
-    public BranchBound(String branchName, String remote) {
+    public BranchBound(String remote, String branchName) {
         this.branchName = branchName;
         this.remote = remote;
+    }
+
+    public String getBound() {
+        return this.branchName;
     }
 
     public String getBoundHash() {
