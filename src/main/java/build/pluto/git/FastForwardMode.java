@@ -1,4 +1,4 @@
-package build.pluto.gitbuilder;
+package build.pluto.git;
 
 import org.eclipse.jgit.api.MergeCommand;
 

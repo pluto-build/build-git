@@ -1,4 +1,4 @@
-package build.pluto.gitbuilder.bound;
+package build.pluto.git.bound;
 
 public class TagBound implements UpdateBound {
 

@@ -1,9 +1,9 @@
-package build.pluto.gitbuilder.stamp;
+package build.pluto.git.stamp;
 
-import build.pluto.gitbuilder.Input;
-import build.pluto.gitbuilder.bound.BranchBound;
-import build.pluto.gitbuilder.exception.NotClonedException;
-import build.pluto.gitbuilder.util.GitHandler;
+import build.pluto.git.Input;
+import build.pluto.git.bound.BranchBound;
+import build.pluto.git.exception.NotClonedException;
+import build.pluto.git.util.GitHandler;
 import build.pluto.stamp.ValueStamp;
 import org.junit.After;
 import org.junit.Before;

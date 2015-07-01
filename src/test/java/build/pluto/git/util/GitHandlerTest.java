@@ -1,9 +1,9 @@
-package build.pluto.gitbuilder.util;
+package build.pluto.git.util;
 
-import build.pluto.gitbuilder.Input;
-import build.pluto.gitbuilder.exception.NotCheckedOutException;
-import build.pluto.gitbuilder.exception.NotClonedException;
-import build.pluto.gitbuilder.exception.NotPulledException;
+import build.pluto.git.Input;
+import build.pluto.git.exception.NotCheckedOutException;
+import build.pluto.git.exception.NotClonedException;
+import build.pluto.git.exception.NotPulledException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
@@ -113,8 +113,8 @@ public class GitHandlerTest {
         try {
             GitHandler.resetRepoToCommit(in.directory, "HEAD^");
             FileCommands.writeToFile(new File(in.directory, "README.md"), "This is a dummy repository for testing.\nLocal Change.");
-            Git.open(in.directory).add().addFilepattern("README.md").call();
-            Git.open(in.directory).commit().setMessage("local changes").call();
+            tested.add("README.md");
+            tested.commit("local changes");
         } catch (IOException e) {
             fail("Could not open the repository");
         } catch (GitAPIException e) {

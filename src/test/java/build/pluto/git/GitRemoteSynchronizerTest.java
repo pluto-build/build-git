@@ -1,11 +1,11 @@
-package build.pluto.gitbuilder;
+package build.pluto.git;
 
 import build.pluto.builder.RequiredBuilderFailed;
-import build.pluto.gitbuilder.bound.BranchBound;
-import build.pluto.gitbuilder.bound.CommitHashBound;
-import build.pluto.gitbuilder.bound.TagBound;
-import build.pluto.gitbuilder.bound.UpdateBound;
-import build.pluto.gitbuilder.util.GitHandler;
+import build.pluto.git.bound.BranchBound;
+import build.pluto.git.bound.CommitHashBound;
+import build.pluto.git.bound.TagBound;
+import build.pluto.git.bound.UpdateBound;
+import build.pluto.git.util.GitHandler;
 import build.pluto.test.build.ScopedBuildTest;
 import build.pluto.test.build.ScopedPath;
 import build.pluto.test.build.TrackingBuildManager;

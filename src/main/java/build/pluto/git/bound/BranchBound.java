@@ -1,7 +1,6 @@
-package build.pluto.gitbuilder.bound;
+package build.pluto.git.bound;
 
-import build.pluto.gitbuilder.util.GitHandler;
-import java.io.File;
+import build.pluto.git.util.GitHandler;
 
 public class BranchBound implements UpdateBound {
 

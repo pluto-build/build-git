@@ -1,7 +1,5 @@
-package build.pluto.gitbuilder.bound;
+package build.pluto.git.bound;
 
-import build.pluto.gitbuilder.util.GitHandler;
-import java.io.File;
 import java.io.Serializable;
 
 public interface UpdateBound extends Serializable {

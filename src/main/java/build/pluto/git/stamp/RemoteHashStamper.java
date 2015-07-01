@@ -1,7 +1,7 @@
-package build.pluto.gitbuilder.stamp;
+package build.pluto.git.stamp;
 
-import build.pluto.gitbuilder.util.GitHandler;
-import build.pluto.gitbuilder.bound.UpdateBound;
+import build.pluto.git.util.GitHandler;
+import build.pluto.git.bound.UpdateBound;
 import build.pluto.stamp.Stamp;
 import build.pluto.stamp.Stamper;
 import build.pluto.stamp.ValueStamp;

@@ -1,10 +1,10 @@
-package build.pluto.gitbuilder;
+package build.pluto.git;
 
 import build.pluto.builder.Builder;
 import build.pluto.builder.BuilderFactory;
-import build.pluto.gitbuilder.stamp.RemoteHashStamper;
-import build.pluto.gitbuilder.util.FileUtil;
-import build.pluto.gitbuilder.util.GitHandler;
+import build.pluto.git.stamp.RemoteHashStamper;
+import build.pluto.git.util.FileUtil;
+import build.pluto.git.util.GitHandler;
 import build.pluto.output.None;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.sugarj.common.FileCommands;

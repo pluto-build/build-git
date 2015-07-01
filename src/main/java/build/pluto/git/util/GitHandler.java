@@ -1,14 +1,13 @@
-package build.pluto.gitbuilder.util;
+package build.pluto.git.util;
 
-import build.pluto.gitbuilder.FastForwardMode;
-import build.pluto.gitbuilder.Input;
-import build.pluto.gitbuilder.bound.UpdateBound;
-import build.pluto.gitbuilder.bound.CommitHashBound;
-import build.pluto.gitbuilder.bound.BranchBound;
-import build.pluto.gitbuilder.exception.NotCheckedOutException;
-import build.pluto.gitbuilder.exception.NotClonedException;
-import build.pluto.gitbuilder.exception.NotFetchedException;
-import build.pluto.gitbuilder.exception.NotPulledException;
+import build.pluto.git.Input;
+import build.pluto.git.bound.UpdateBound;
+import build.pluto.git.bound.CommitHashBound;
+import build.pluto.git.bound.BranchBound;
+import build.pluto.git.exception.NotCheckedOutException;
+import build.pluto.git.exception.NotClonedException;
+import build.pluto.git.exception.NotFetchedException;
+import build.pluto.git.exception.NotPulledException;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
@@ -133,9 +132,17 @@ public class GitHandler {
         }
     }
 
+    public void add(String filePattern) {
+        try {
+            this.git.add().addFilepattern(filePattern).call();
+        } catch (GitAPIException e ) {
         }
     }
 
+    public void commit(String message) {
+        try {
+            this.git.commit().setMessage(message).call();
+        } catch (GitAPIException e ) {
         }
     }
 
