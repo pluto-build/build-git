@@ -1,5 +1,24 @@
 package build.pluto.gitbuilder;
 
+import org.eclipse.jgit.api.MergeCommand;
+
 public enum FastForwardMode {
-    FF, FF_ONLY, NO_FF
+    FF {
+        @Override
+        public MergeCommand.FastForwardMode getMode() {
+            return MergeCommand.FastForwardMode.FF;
+        }
+    }, FF_ONLY {
+        @Override
+        public MergeCommand.FastForwardMode getMode() {
+            return MergeCommand.FastForwardMode.FF_ONLY;
+        }
+    }, NO_FF {
+        @Override
+        public MergeCommand.FastForwardMode getMode() {
+            return MergeCommand.FastForwardMode.NO_FF;
+        }
+    };
+
+    public abstract MergeCommand.FastForwardMode getMode();
 }
