@@ -22,7 +22,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class GitRepositoryBuilderTest extends ScopedBuildTest {
+public class GitRemoteSynchronizerTest extends ScopedBuildTest {
 
     @ScopedPath("")
     private File directory;
@@ -127,7 +127,7 @@ public class GitRepositoryBuilderTest extends ScopedBuildTest {
         inputBuilder.addBranchToClone("feature");
         inputBuilder.setBound(this.bound);
         Input input = inputBuilder.build();
-        manager.require(GitRepositoryBuilder.factory, input);
+        manager.require(GitRemoteSynchronizer.factory, input);
         return manager;
     }
 

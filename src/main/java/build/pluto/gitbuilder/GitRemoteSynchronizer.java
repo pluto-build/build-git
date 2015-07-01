@@ -13,11 +13,11 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
-public class GitRepositoryBuilder extends Builder<Input, None> {
+public class GitRemoteSynchronizer extends Builder<Input, None> {
 
-    public static BuilderFactory<Input, None, GitRepositoryBuilder> factory = BuilderFactory.of(GitRepositoryBuilder.class, Input.class);
+    public static BuilderFactory<Input, None, GitRemoteSynchronizer> factory = BuilderFactory.of(GitRemoteSynchronizer.class, Input.class);
     
-    public GitRepositoryBuilder(Input input) {
+    public GitRemoteSynchronizer(Input input) {
         super(input);
     }
 
