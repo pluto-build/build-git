@@ -183,7 +183,7 @@ public class GitHandler {
         }
     }
 
-    public static String getHashOfHEAD(File directory) throws Exception {
+    public static String getHashOfHEAD(File directory) throws IOException {
         Git git = openRepository(directory);
         Ref headRef = git.getRepository().getRef("HEAD");
         ObjectId objectId = headRef.getObjectId();
