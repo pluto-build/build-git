@@ -26,50 +26,38 @@ import java.util.Set;
 
 public class GitHandler {
 
-    private Git git;
-    private Input input;
-
-    public GitHandler(Input input) {
+    private static Git openRepository(File directory) {
         try {
-            this.git = openRepository(input.directory);
-        } catch(Exception e) {
-            this.git = null;
+            return Git.open(directory);
+        } catch (IOException e) {
+            return null;
         }
-        this.input = input;
     }
 
-    private static Git openRepository(File directory) throws Exception {
-            try {
-                return Git.open(directory);
-            } catch (IOException e) {
-                throw new Exception();
-            }
-    }
-
-    public void cloneRepository() throws NotClonedException {
+    public static void cloneRepository(Input input) throws NotClonedException {
         try {
             List<String> branchesToClone = new ArrayList<>();
-            this.git = Git.cloneRepository()
+            Git git = Git.cloneRepository()
                     .setURI(input.url)
                     .setDirectory(input.directory)
                     .setCloneSubmodules(input.cloneSubmodules)
                     .call();
             for(String branchName : input.branchesToClone) {
-                this.git.checkout()
-                        .setCreateBranch(true)
-                        .setName(branchName)
-                        .setStartPoint("origin/" + branchName).call();
+                git.checkout()
+                   .setCreateBranch(true)
+                   .setName(branchName)
+                   .setStartPoint("origin/" + branchName).call();
             }
-            this.git.checkout().setName("master").call();
+            git.checkout().setName("master").call();
         } catch (GitAPIException e) {
-            this.git = null;
             e.printStackTrace();
             throw new NotClonedException();
         }
     }
 
-    public void checkout(String hash) throws NotCheckedOutException {
+    public static void checkout(File directory, String hash) throws NotCheckedOutException {
         try {
+            Git git = openRepository(directory);
             git.checkout()
                .setName(hash)
                .call();
@@ -78,15 +66,15 @@ public class GitHandler {
         }
     }
 
-    public void pull() throws NotPulledException {
+    public static void pull(Input input) throws NotPulledException {
         FetchResult fetchResult = null;
         try {
-            fetchResult = fetch();
+            fetchResult = fetch(input.directory, input.url);
         } catch (NotFetchedException e) {
             throw new NotPulledException();
         }
         try {
-            MergeResult mergeResult = merge(fetchResult.getAdvertisedRef("HEAD"));
+            MergeResult mergeResult = merge(input, fetchResult.getAdvertisedRef("HEAD"));
             if (!mergeResult.getMergeStatus().isSuccessful()) {
                 throw new NotPulledException();
             }
@@ -95,31 +83,34 @@ public class GitHandler {
         }
     }
 
-    private FetchResult fetch() throws NotFetchedException {
+    private static FetchResult fetch(File directory, String url) throws NotFetchedException {
         try {
-            String url = getRemoteOfUrl();
-            FetchCommand fetch = git.fetch()
-                                    .setRemote(url);
-            return fetch.call();
+            String remoteOfUrl = getRemoteOfUrl(directory, url);
+            Git git = openRepository(directory);
+            return git.fetch()
+                      .setRemote(remoteOfUrl)
+                      .call();
         } catch (GitAPIException e) {
             throw new NotFetchedException();
         }
     }
 
-    private String getRemoteOfUrl() {
+    private static String getRemoteOfUrl(File directory, String url) {
+        Git git = openRepository(directory);
         StoredConfig config = git.getRepository().getConfig();
         Set<String> remotes = config.getSubsections("remote");
         for (String remote : remotes) {
-            String url = config.getString("remote", remote, "url");
-            if(url.equals(input.url)) {
+            String remoteUrl = config.getString("remote", remote, "url");
+            if(remoteUrl.equals(url)) {
                 return remote;
             }
         }
         return null;
     }
 
-    private MergeResult merge(Ref ref) throws NotMergedException {
+    private static MergeResult merge(Input input, Ref ref) throws NotMergedException {
         try {
+            Git git = openRepository(input.directory);
             MergeCommand merge = git.merge();
             merge.include(ref);
             merge.setCommit(input.createMergeCommit);
@@ -132,36 +123,39 @@ public class GitHandler {
         }
     }
 
-    public void add(String filePattern) {
+    public static void add(File directory, String filePattern) {
         try {
-            this.git.add().addFilepattern(filePattern).call();
+            Git git = openRepository(directory);
+            git.add().addFilepattern(filePattern).call();
         } catch (GitAPIException e ) {
         }
     }
 
-    public void commit(String message) {
+    public static void commit(File directory, String message) {
         try {
-            this.git.commit().setMessage(message).call();
+            Git git = openRepository(directory);
+            git.commit().setMessage(message).call();
         } catch (GitAPIException e ) {
         }
     }
 
-    public boolean isUrlSet() {
+    public static boolean isUrlSet(File directory, String url) {
+        Git git = openRepository(directory);
         StoredConfig config = git.getRepository().getConfig();
         Set<String> remotes = config.getSubsections("remote");
         boolean foundRemote = false;
         for (String remote : remotes) {
-            String url = config.getString("remote", remote, "url");
-            if (url.equals(input.url)) {
+            String configUrl = config.getString("remote", remote, "url");
+            if (configUrl.equals(url)) {
                 foundRemote = true;
             }
         }
         return foundRemote;
     }
 
-    public boolean isUrlAccessible() {
+    public static boolean isUrlAccessible(String url) {
         try {
-            Git.lsRemoteRepository().setRemote(input.url).call();
+            Git.lsRemoteRepository().setRemote(url).call();
         } catch (GitAPIException e) {
             return false;
         }
@@ -179,8 +173,11 @@ public class GitHandler {
 
     public static void resetRepoToCommit(File directory, String commitHash) throws InvalidRefNameException {
         try {
-            Git.open(directory).reset().setMode(ResetCommand.ResetType.HARD).setRef(commitHash).call();
-        } catch (IOException e) {
+            Git git = openRepository(directory);
+            git.reset()
+               .setMode(ResetCommand.ResetType.HARD)
+               .setRef(commitHash)
+               .call();
         } catch (GitAPIException e) {
             throw new InvalidRefNameException("Ref  " + commitHash + " does not exist");
         }

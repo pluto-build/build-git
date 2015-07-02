@@ -23,7 +23,6 @@ import static org.junit.Assert.*;
 public class GitHandlerTest {
 
     private Input in;
-    private GitHandler tested;
     private String dummyPath;
 
     @Before
@@ -31,7 +30,6 @@ public class GitHandlerTest {
         File dummyLocation = new File("src/test/resources/dummy");
         this.dummyPath = "file://" + dummyLocation.getAbsolutePath();
         this.in = this.createInput("test", this.dummyPath);
-        this.tested = new GitHandler(in);
     }
 
     @After
@@ -45,19 +43,17 @@ public class GitHandlerTest {
 
     @Test
     public void checkIsUrlAccessible() {
-        assertTrue(tested.isUrlAccessible());
+        assertTrue(GitHandler.isUrlAccessible(in.url));
     }
 
     @Test
     public void checkNotIsUrlAccessible() {
-        Input in = this.createInput("test", "https://github.com/andider/dummy.git");
-        GitHandler tested = new GitHandler(in);
-        assertFalse(tested.isUrlAccessible());
+        assertFalse(GitHandler.isUrlAccessible("deadlink"));
     }
 
     @Test
     public void checkClone() {
-        this.clone(tested);
+        clone(in);
         boolean fileExists = false;
         for (Path p : FileCommands.listFilesRecursive(in.directory.toPath())) {
             if (p.getFileName().toString().equals("README.md")) {
@@ -69,34 +65,32 @@ public class GitHandlerTest {
 
     @Test
     public void checkIsUrlSet() {
-        this.clone(tested);
-        assertTrue(tested.isUrlSet());
+        clone(in);
+        assertTrue(GitHandler.isUrlSet(in.directory, in.url));
     }
 
     @Test
     public void checkIsUrlNotSet() {
         try {
-            tested.cloneRepository();
+            clone(in);
             Repository repo = Git.open(in.directory).getRepository();
             StoredConfig config = repo.getConfig();
             config.unsetSection("remote", "origin");
             config.save();
-            assertFalse(tested.isUrlSet());
+            assertFalse(GitHandler.isUrlSet(in.directory, in.url));
         } catch (IOException e) {
             fail("Could not open repository");
-        } catch (NotClonedException e) {
-            fail("Could not clone repository");
         }
     }
 
     @Test
     public void checkPull() throws InvalidRefNameException {
-        this.clone(tested);
         try {
+            clone(in);
             String content = FileCommands.readFileAsString(new File(in.directory, "README.md"));
             assertEquals(content, "This is a dummy repository for testing.\n");
             GitHandler.resetRepoToCommit(in.directory, "HEAD^");
-            tested.pull();
+            GitHandler.pull(in);
             content = FileCommands.readFileAsString(new File(in.directory, "README.md"));
             assertEquals(content, "This is a dummy repository for testing.\n");
         } catch (IOException e) {
@@ -109,36 +103,36 @@ public class GitHandlerTest {
 
     @Test(expected = NotPulledException.class)
     public void checkPullWithLocalCommit() throws NotPulledException {
-        this.clone(tested);
+        clone(in);
         try {
             GitHandler.resetRepoToCommit(in.directory, "HEAD^");
             FileCommands.writeToFile(new File(in.directory, "README.md"), "This is a dummy repository for testing.\nLocal Change.");
-            tested.add("README.md");
-            tested.commit("local changes");
+            GitHandler.add(in.directory, "README.md");
+            GitHandler.commit(in.directory, "local changes");
         } catch (IOException e) {
             fail("Could not open the repository");
         } catch (GitAPIException e) {
             fail("Could not commit local change");
         }
-        tested.pull();
+        GitHandler.pull(in);
     }
 
     @Test
     public void testCheckout() {
-       this.clone(tested);
-       Exception ex = null;
-       try {
-           tested.checkout("feature");
-       } catch (NotCheckedOutException e ) {
-           ex = e;
-       }
-       assertNull(ex);
+        clone(in);
+        Exception ex = null;
+        try {
+            GitHandler.checkout(in.directory, "feature");
+        } catch (NotCheckedOutException e ) {
+            ex = e;
+        }
+        assertNull(ex);
     }
 
     @Test(expected = NotCheckedOutException.class)
     public void testCheckoutFailed() throws NotCheckedOutException {
-        this.clone(tested);
-        tested.checkout("master2");
+        clone(in);
+        GitHandler.checkout(in.directory, "master2");
     }
 
     @Test
@@ -153,9 +147,9 @@ public class GitHandlerTest {
         assertEquals("c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f", s);
     }
 
-    private void clone(GitHandler handler) {
+    private void clone(Input input) {
         try {
-            handler.cloneRepository();
+            GitHandler.cloneRepository(input);
         } catch (NotClonedException e) {
             fail("Could not clone repository");
         }

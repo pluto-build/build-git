@@ -65,6 +65,27 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
         deleteTempCommitOnRemote();
     }
 
+    @Test
+    public void testPullAfterCheckout() throws Exception {
+        build();
+        createCommitOnRemote();
+        String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD("file://" + remoteLocation.getAbsolutePath(), "master");
+        GitHandler.checkout(directory, "feature");
+        assertCorrectHead("c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f");
+        build();
+        assertCorrectHead(newHEADHashOfRemote);
+        deleteTempCommitOnRemote();
+    }
+
+    @Test
+    public void testBuildAfterCheckout() throws Exception {
+        build();
+        GitHandler.checkout(directory, "feature");
+        assertCorrectHead("c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f");
+        build();
+        assertCorrectHead("ddfa2acb09533f16792f6006316ce2744792d839");
+    }
+
     @Test(expected = RequiredBuilderFailed.class)
     public void testRemoteNotAccessible() throws IOException {
         remoteLocation = new File("deadlink");
@@ -132,8 +153,12 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     }
 
     private void assertCorrectHead(String hash) {
-        String commitHash = GitHandler.getHashOfRemoteHEAD("file://" + directory.getAbsolutePath(), "master");
-        assertEquals(hash, commitHash);
+        try{
+            String commitHash = GitHandler.getHashOfHEAD(directory);
+            assertEquals(hash, commitHash);
+        } catch (Exception e) {
+            fail("Could not read hash of HEAD");
+        }
     }
 
     private void createCommitOnRemote() {

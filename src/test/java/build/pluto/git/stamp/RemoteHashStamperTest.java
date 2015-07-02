@@ -57,9 +57,8 @@ public class RemoteHashStamperTest {
     public void testRemoteIsNotAccessible() {
         Input.Builder inputBuilder = new Input.Builder(directory, this.dummyPath, null);
         Input input = inputBuilder.build();
-        GitHandler git = new GitHandler(input);
         try {
-            git.cloneRepository();
+            GitHandler.cloneRepository(input);
         } catch (NotClonedException e) {
             fail("Could not clone directory");
         }

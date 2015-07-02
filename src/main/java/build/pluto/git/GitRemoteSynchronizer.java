@@ -36,11 +36,10 @@ public class GitRemoteSynchronizer extends Builder<Input, None> {
 
     @Override
     protected None build(Input input) throws Throwable {
-        GitHandler git = new GitHandler(input);
         this.require(input.directory, new RemoteHashStamper(input.url, input.bound));
         if (!FileCommands.exists(input.directory) || FileUtil.directoryIsEmpty(input.directory)) {
-            if (git.isUrlAccessible()) {
-                git.cloneRepository();
+            if (GitHandler.isUrlAccessible(input.url)) {
+                GitHandler.cloneRepository(input);
                 if(input.bound != null) {
                     GitHandler.resetRepoToCommit(input.directory, input.bound.getBoundHash());
                 }
@@ -48,9 +47,9 @@ public class GitRemoteSynchronizer extends Builder<Input, None> {
                 throw new TransportException(input.url + " can not be accessed");
             }
         } else {
-            if (GitHandler.isRepo(input.directory) && git.isUrlSet()) {
-                git.checkout(input.bound.getBound());
-                git.pull();
+            if (GitHandler.isRepo(input.directory) && GitHandler.isUrlSet(input.directory, input.url)) {
+                GitHandler.checkout(input.directory, input.bound.getBound());
+                GitHandler.pull(input);
             } else {
                 throw new IllegalArgumentException(input.directory.toString() + " is not empty and does contains other data than the repository");
             }
