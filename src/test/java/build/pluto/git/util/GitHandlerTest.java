@@ -28,6 +28,9 @@ public class GitHandlerTest {
 
     private Input in;
     private String dummyPath;
+    private final String featureHeadHash = "c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f";
+    private final String masterHeadHash = "ddfa2acb09533f16792f6006316ce2744792d839";
+    private final String tagHash = "3d8913c40c2387488172368a5cf9cf5eb64fed88";
 
     @Before
     public void init() {
@@ -142,34 +145,34 @@ public class GitHandlerTest {
     @Test
     public void checkGetHashOfRemoteHEADMaster() {
         String s = GitHandler.getHashOfRemoteHEAD(this.dummyPath, "master");
-        assertEquals("ddfa2acb09533f16792f6006316ce2744792d839", s);
+        assertEquals(masterHeadHash, s);
     }
 
     @Test
     public void checkGetHashOfRemoteHEADFeature() {
         String s = GitHandler.getHashOfRemoteHEAD(this.dummyPath, "feature");
-        assertEquals("c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f", s);
+        assertEquals(featureHeadHash, s);
     }
 
     @Test
     public void checkGetHashOfCommitHashBound(){
-        UpdateBound bound = new CommitHashBound("ddfa2acb09533f16792f6006316ce2744792d839");
+        UpdateBound bound = new CommitHashBound(masterHeadHash);
         String s = GitHandler.getHashOfBound(dummyPath, bound);
-        assertEquals("ddfa2acb09533f16792f6006316ce2744792d839", s);
+        assertEquals(masterHeadHash, s);
     }
 
     @Test
     public void checkGetHashOfTagBound(){
         UpdateBound bound = new TagBound(dummyPath, "v0.1");
         String s = GitHandler.getHashOfBound(dummyPath, bound);
-        assertEquals("3d8913c40c2387488172368a5cf9cf5eb64fed88", s);
+        assertEquals(tagHash, s);
     }
 
     @Test
     public void checkGetHashOfBranchBound(){
         UpdateBound bound = new BranchBound(dummyPath, "feature");
         String s = GitHandler.getHashOfBound(dummyPath, bound);
-        assertEquals("c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f", s);
+        assertEquals(featureHeadHash, s);
     }
 
     private void clone(Input input) {

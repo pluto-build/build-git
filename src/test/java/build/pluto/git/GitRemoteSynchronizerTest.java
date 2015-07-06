@@ -29,16 +29,21 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     private File remoteLocation;
     private UpdateBound bound;
 
+    private final String featureHeadHash = "c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f";
+    private final String masterHeadHash = "ddfa2acb09533f16792f6006316ce2744792d839";
+    private final String master2HeadHash = "99417aa270f38d6a7d5aef584570653f58eef14b";
+    private final String tagHash = "3d8913c40c2387488172368a5cf9cf5eb64fed88";
+
     @Before
     public void init() {
         this.remoteLocation = new File("src/test/resources/dummy");
-        this.bound = new BranchBound("file://" + remoteLocation.getAbsolutePath(), "master");
+        this.bound = new BranchBound(getPathOfRemote(), "master");
     }
 
     @Test
     public void testDirectoryEmpty() throws IOException {
         build();
-        assertCorrectHead("ddfa2acb09533f16792f6006316ce2744792d839");
+        assertCorrectHead(masterHeadHash);
     }
 
     @Test(expected = RequiredBuilderFailed.class)
@@ -52,14 +57,14 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     public void testCleanRebuildDoesNothing() throws IOException {
         build();
         build();
-        assertCorrectHead("ddfa2acb09533f16792f6006316ce2744792d839");
+        assertCorrectHead(masterHeadHash);
     }
 
     @Test
     public void testNeedToPull() throws IOException, InvalidRefNameException {
         build();
         createCommitOnRemote();
-        String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD("file://" + remoteLocation.getAbsolutePath(), "master");
+        String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD(getPathOfRemote(), "master");
         build();
         assertCorrectHead(newHEADHashOfRemote);
         deleteTempCommitOnRemote();
@@ -69,9 +74,9 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     public void testPullAfterCheckout() throws Exception {
         build();
         createCommitOnRemote();
-        String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD("file://" + remoteLocation.getAbsolutePath(), "master");
+        String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD(getPathOfRemote(), "master");
         GitHandler.checkout(directory, "feature");
-        assertCorrectHead("c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f");
+        assertCorrectHead(featureHeadHash);
         build();
         assertCorrectHead(newHEADHashOfRemote);
         deleteTempCommitOnRemote();
@@ -81,9 +86,9 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     public void testBuildAfterCheckout() throws Exception {
         build();
         GitHandler.checkout(directory, "feature");
-        assertCorrectHead("c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f");
+        assertCorrectHead(featureHeadHash);
         build();
-        assertCorrectHead("ddfa2acb09533f16792f6006316ce2744792d839");
+        assertCorrectHead(masterHeadHash);
     }
 
     @Test(expected = RequiredBuilderFailed.class)
@@ -94,62 +99,64 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
 
     @Test
     public void testCommitBoundCurrentHEADAfterClone() throws IOException {
-        String commitHash = "99417aa270f38d6a7d5aef584570653f58eef14b";
-        this.bound = new CommitHashBound(commitHash);
+        this.bound = new CommitHashBound(masterHeadHash);
         build();
-        assertCorrectHead(commitHash);
+        assertCorrectHead(masterHeadHash);
     }
 
     @Test
     public void testCommitBoundCurrentHEADAfterPull() throws IOException {
-        String commitHash = "99417aa270f38d6a7d5aef584570653f58eef14b";
-        this.bound = new CommitHashBound(commitHash);
+        this.bound = new CommitHashBound(masterHeadHash);
         build();
         build();
-        assertCorrectHead(commitHash);
+        assertCorrectHead(masterHeadHash);
     }
 
     @Test
     public void testTagBoundCurrentHEADAfterClone() throws IOException {
-        this.bound = new TagBound("v0.1");
+        this.bound = new TagBound(getPathOfRemote(), "v0.1");
         build();
-        assertCorrectHead("3d8913c40c2387488172368a5cf9cf5eb64fed88");
+        assertCorrectHead(tagHash);
     }
 
     @Test
     public void testTagBoundCurrentHEADAfterPull() throws IOException {
-        this.bound = new TagBound("v0.1");
+        this.bound = new TagBound(getPathOfRemote(), "v0.1");
         build();
         build();
-        assertCorrectHead("3d8913c40c2387488172368a5cf9cf5eb64fed88");
+        assertCorrectHead(tagHash);
     }
 
     @Test
     public void testBranchBoundCurrentHEADAfterClone() throws IOException {
-        this.bound = new BranchBound("file://"+ this.remoteLocation.getAbsolutePath(), "master2");
+        this.bound = new BranchBound(getPathOfRemote(), "master2");
         build();
-        assertCorrectHead("99417aa270f38d6a7d5aef584570653f58eef14b");
+        assertCorrectHead(master2HeadHash);
     }
 
     @Test
     public void testBranchBoundCurrentHEADAfterPull() throws IOException {
-        this.bound = new BranchBound("file://"+ this.remoteLocation.getAbsolutePath(), "master2");
+        this.bound = new BranchBound(getPathOfRemote(), "master2");
         build();
         build();
-        assertCorrectHead("99417aa270f38d6a7d5aef584570653f58eef14b");
+        assertCorrectHead(master2HeadHash);
     }
 
     private TrackingBuildManager build() throws IOException {
         File binaryPath = null;
         TrackingBuildManager manager = new TrackingBuildManager();
         File summaryLocation = new File(directory, "temp");
-        Input.Builder inputBuilder = new Input.Builder(directory, "file://" + remoteLocation.getAbsolutePath(), summaryLocation);
+        Input.Builder inputBuilder = new Input.Builder(directory, getPathOfRemote(), summaryLocation);
         inputBuilder.addBranchToClone("master2");
         inputBuilder.addBranchToClone("feature");
         inputBuilder.setBound(this.bound);
         Input input = inputBuilder.build();
         manager.require(GitRemoteSynchronizer.factory, input);
         return manager;
+    }
+
+    private String getPathOfRemote() {
+        return "file://" + this.remoteLocation.getAbsolutePath();
     }
 
     private void assertCorrectHead(String hash) {
@@ -176,6 +183,6 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     }
 
     private void deleteTempCommitOnRemote() throws InvalidRefNameException {
-        GitHandler.resetRepoToCommit(remoteLocation, "ddfa2acb09533f16792f6006316ce2744792d839");
+        GitHandler.resetRepoToCommit(remoteLocation, masterHeadHash);
     }
 }
