@@ -15,15 +15,17 @@ import java.util.List;
 
 public class GitRemoteSynchronizer extends Builder<Input, None> {
 
-    public static BuilderFactory<Input, None, GitRemoteSynchronizer> factory = BuilderFactory.of(GitRemoteSynchronizer.class, Input.class);
-    
+    public static BuilderFactory<Input, None, GitRemoteSynchronizer> factory
+        = BuilderFactory.of(GitRemoteSynchronizer.class, Input.class);
+
     public GitRemoteSynchronizer(Input input) {
         super(input);
     }
 
     @Override
     protected String description(Input input) {
-        return "Keeps the directory " + input.directory.toString() + " in sync with " + input.url;
+        return "Keeps the directory " + input.directory.toString()
+               + " in sync with " + input.url;
     }
 
     @Override
@@ -47,16 +49,19 @@ public class GitRemoteSynchronizer extends Builder<Input, None> {
                 throw new TransportException(input.url + " can not be accessed");
             }
         } else {
-            if (GitHandler.isRepo(input.directory) && GitHandler.isUrlSet(input.directory, input.url)) {
+            if (GitHandler.isRepo(input.directory)
+                    && GitHandler.isUrlSet(input.directory, input.url)) {
                 GitHandler.checkout(input.directory, input.bound.getBound());
                 GitHandler.pull(input);
             } else {
-                throw new IllegalArgumentException(input.directory.toString() + " is not empty and does contains other data than the repository");
+                throw new IllegalArgumentException(input.directory.toString()
+                  + " is not empty and does contains other data than the repository");
             }
         }
 
         //TODO: maybe only provide files not ignored by .gitignore
-        List<Path> outputFiles = FileCommands.listFilesRecursive(input.directory.toPath());
+        List<Path> outputFiles
+            = FileCommands.listFilesRecursive(input.directory.toPath());
         File gitDirectory = new File(input.directory, ".git");
         for (Path p : outputFiles) {
             if (!FileUtil.containsFile(gitDirectory, p.toFile())) {
