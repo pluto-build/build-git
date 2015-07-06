@@ -55,7 +55,8 @@ public class GitHandler {
         }
     }
 
-    public static void checkout(File directory, String hash) throws NotCheckedOutException {
+    public static void checkout(File directory, String hash)
+            throws NotCheckedOutException {
         try {
             Git git = openRepository(directory);
             git.checkout()
@@ -74,7 +75,8 @@ public class GitHandler {
             throw new NotPulledException();
         }
         try {
-            MergeResult mergeResult = merge(input, fetchResult.getAdvertisedRef("HEAD"));
+            MergeResult mergeResult
+                = merge(input, fetchResult.getAdvertisedRef("HEAD"));
             if (!mergeResult.getMergeStatus().isSuccessful()) {
                 throw new NotPulledException();
             }
@@ -83,7 +85,8 @@ public class GitHandler {
         }
     }
 
-    private static FetchResult fetch(File directory, String url) throws NotFetchedException {
+    private static FetchResult fetch(File directory, String url)
+            throws NotFetchedException {
         try {
             String remoteOfUrl = getRemoteOfUrl(directory, url);
             Git git = openRepository(directory);
@@ -108,7 +111,8 @@ public class GitHandler {
         return null;
     }
 
-    private static MergeResult merge(Input input, Ref ref) throws NotMergedException {
+    private static MergeResult merge(Input input, Ref ref)
+            throws NotMergedException {
         try {
             Git git = openRepository(input.directory);
             MergeCommand merge = git.merge();
@@ -171,7 +175,8 @@ public class GitHandler {
         return true;
     }
 
-    public static void resetRepoToCommit(File directory, String commitHash) throws InvalidRefNameException {
+    public static void resetRepoToCommit(File directory, String commitHash)
+            throws InvalidRefNameException {
         try {
             Git git = openRepository(directory);
             git.reset()
@@ -179,7 +184,8 @@ public class GitHandler {
                .setRef(commitHash)
                .call();
         } catch (GitAPIException e) {
-            throw new InvalidRefNameException("Ref  " + commitHash + " does not exist");
+            throw new InvalidRefNameException("Ref  "
+                    + commitHash + " does not exist");
         }
     }
 
