@@ -201,11 +201,18 @@ public class GitHandler {
         }
         String refName = bound.getBound();
         try {
-            Collection<Ref> refs = Git.lsRemoteRepository().setRemote(url).setHeads(true).setTags(true).call();
+            Collection<Ref> refs = Git.lsRemoteRepository()
+                                      .setRemote(url)
+                                      .setHeads(true)
+                                      .setTags(true)
+                                      .call();
             for (Ref ref : refs) {
                 boolean isCorrectRef = ref.getName().contains(refName);
                 if (isCorrectRef) {
-                    ObjectId objectId = ref.getObjectId();
+                    ObjectId objectId = ref.getPeeledObjectId();
+                    if (objectId == null) {
+                        objectId = ref.getObjectId();
+                    }
                     return ObjectId.toString(objectId);
                 }
             }

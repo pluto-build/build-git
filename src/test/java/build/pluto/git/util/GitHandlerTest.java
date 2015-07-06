@@ -1,6 +1,10 @@
 package build.pluto.git.util;
 
 import build.pluto.git.Input;
+import build.pluto.git.bound.UpdateBound;
+import build.pluto.git.bound.TagBound;
+import build.pluto.git.bound.BranchBound;
+import build.pluto.git.bound.CommitHashBound;
 import build.pluto.git.exception.NotCheckedOutException;
 import build.pluto.git.exception.NotClonedException;
 import build.pluto.git.exception.NotPulledException;
@@ -144,6 +148,27 @@ public class GitHandlerTest {
     @Test
     public void checkGetHashOfRemoteHEADFeature() {
         String s = GitHandler.getHashOfRemoteHEAD(this.dummyPath, "feature");
+        assertEquals("c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f", s);
+    }
+
+    @Test
+    public void checkGetHashOfCommitHashBound(){
+        UpdateBound bound = new CommitHashBound("ddfa2acb09533f16792f6006316ce2744792d839");
+        String s = GitHandler.getHashOfBound(dummyPath, bound);
+        assertEquals("ddfa2acb09533f16792f6006316ce2744792d839", s);
+    }
+
+    @Test
+    public void checkGetHashOfTagBound(){
+        UpdateBound bound = new TagBound(dummyPath, "v0.1");
+        String s = GitHandler.getHashOfBound(dummyPath, bound);
+        assertEquals("3d8913c40c2387488172368a5cf9cf5eb64fed88", s);
+    }
+
+    @Test
+    public void checkGetHashOfBranchBound(){
+        UpdateBound bound = new BranchBound(dummyPath, "feature");
+        String s = GitHandler.getHashOfBound(dummyPath, bound);
         assertEquals("c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f", s);
     }
 
