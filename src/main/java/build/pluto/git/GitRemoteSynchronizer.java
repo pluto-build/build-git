@@ -2,16 +2,18 @@ package build.pluto.git;
 
 import build.pluto.builder.Builder;
 import build.pluto.builder.BuilderFactory;
-import build.pluto.git.stamp.RemoteHashStamper;
+import build.pluto.dependency.RemoteRequirement;
+import build.pluto.git.dependency.GitRemoteRequirement;
 import build.pluto.git.util.FileUtil;
 import build.pluto.git.util.GitHandler;
 import build.pluto.output.None;
-import org.eclipse.jgit.api.errors.TransportException;
-import org.sugarj.common.FileCommands;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+
+import org.eclipse.jgit.api.errors.TransportException;
+import org.sugarj.common.FileCommands;
 
 public class GitRemoteSynchronizer extends Builder<Input, None> {
 
@@ -38,25 +40,23 @@ public class GitRemoteSynchronizer extends Builder<Input, None> {
 
     @Override
     protected None build(Input input) throws Throwable {
-        this.require(input.directory, new RemoteHashStamper(input.url, input.bound));
-        if (!FileCommands.exists(input.directory) || FileUtil.directoryIsEmpty(input.directory)) {
-            if (GitHandler.isUrlAccessible(input.url)) {
-                GitHandler.cloneRepository(input);
-                if(input.bound != null) {
-                    GitHandler.resetRepoToCommit(input.directory, input.bound.getBoundHash());
-                }
-            } else {
-                throw new TransportException(input.url + " can not be accessed");
+        if (!input.isValid()) {
+            throw new IllegalArgumentException("Input was not correctly build.");
+        }
+
+        RemoteRequirement gitRequirement
+            = new GitRemoteRequirement(input.url, input.directory, input.bound);
+        this.require(gitRequirement);
+        if (!FileCommands.exists(input.directory)
+                || FileUtil.directoryIsEmpty(input.directory)) {
+            GitHandler.cloneRepository(input);
+            if(input.bound != null) {
+                GitHandler.resetRepoToCommit(input.directory,
+                                             input.bound.getBoundHash());
             }
         } else {
-            if (GitHandler.isRepo(input.directory)
-                    && GitHandler.isUrlSet(input.directory, input.url)) {
-                GitHandler.checkout(input.directory, input.bound.getBound());
-                GitHandler.pull(input);
-            } else {
-                throw new IllegalArgumentException(input.directory.toString()
-                  + " is not empty and does contains other data than the repository");
-            }
+            GitHandler.checkout(input.directory, input.bound.getBound());
+            GitHandler.pull(input);
         }
 
         //TODO: maybe only provide files not ignored by .gitignore

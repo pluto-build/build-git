@@ -145,6 +145,9 @@ public class GitHandler {
 
     public static boolean isUrlSet(File directory, String url) {
         Git git = openRepository(directory);
+        if(git == null) {
+            return false;
+        }
         StoredConfig config = git.getRepository().getConfig();
         Set<String> remotes = config.getSubsections("remote");
         boolean foundRemote = false;

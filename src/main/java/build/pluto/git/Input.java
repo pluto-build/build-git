@@ -2,6 +2,8 @@ package build.pluto.git;
 
 import build.pluto.git.bound.UpdateBound;
 import build.pluto.git.bound.BranchBound;
+import build.pluto.git.util.GitHandler;
+import build.pluto.git.util.FileUtil;
 
 import java.io.File;
 import java.io.Serializable;
@@ -34,6 +36,19 @@ public class Input implements Serializable {
         this.createMergeCommit = builder.createMergeCommit;
         this.squashCommit = builder.squashCommit;
         this.bound = builder.bound;
+    }
+
+    public boolean isValid() {
+        if (!GitHandler.isUrlAccessible(url)) {
+            return false;
+        }
+        if (!FileUtil.directoryIsEmpty(directory)) {
+            if (GitHandler.isRepo(directory)) {
+                return GitHandler.isUrlSet(directory, url);
+            }
+            return false;
+        }
+        return true;
     }
 
     public static class Builder {

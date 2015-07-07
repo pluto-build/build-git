@@ -49,7 +49,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     @Test(expected = RequiredBuilderFailed.class)
     public void testDirectoryNotEmpty() throws IOException {
         File tempFile = new File(directory, "OK.txt");
-        FileCommands.createDir(tempFile.toPath());
+        FileCommands.createFile(tempFile);
         build();
     }
 
