@@ -25,7 +25,7 @@ public class FileUtilTest {
     public void checkDirectoryIsEmpty() {
         try {
             FileCommands.createDir(this.testDir.toPath());
-            assertTrue(FileUtil.directoryIsEmpty(this.testDir));
+            assertTrue(FileUtil.isDirectoryEmpty(this.testDir));
         } catch (IOException e) {
             fail("Could not create temporary directory");
         }
@@ -37,7 +37,7 @@ public class FileUtilTest {
             FileCommands.createDir(this.testDir.toPath());
             File dotFile = new File(this.testDir, ".dot");
             FileCommands.createFile(dotFile);
-            assertFalse(FileUtil.directoryIsEmpty(this.testDir));
+            assertFalse(FileUtil.isDirectoryEmpty(this.testDir));
         } catch (IOException e) {
             fail("Could not create temporary directory");
         }
@@ -49,7 +49,7 @@ public class FileUtilTest {
             FileCommands.createDir(this.testDir.toPath());
             File file = new File(this.testDir, "test.txt");
             FileCommands.createFile(file);
-            assertFalse(FileUtil.directoryIsEmpty(this.testDir));
+            assertFalse(FileUtil.isDirectoryEmpty(this.testDir));
         } catch (IOException e) {
             fail("Could not create temporary directory");
         }

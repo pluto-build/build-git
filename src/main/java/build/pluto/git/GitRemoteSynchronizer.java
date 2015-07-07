@@ -12,7 +12,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.eclipse.jgit.api.errors.TransportException;
 import org.sugarj.common.FileCommands;
 
 public class GitRemoteSynchronizer extends Builder<Input, None> {
@@ -48,7 +47,7 @@ public class GitRemoteSynchronizer extends Builder<Input, None> {
             = new GitRemoteRequirement(input.url, input.directory, input.bound);
         this.require(gitRequirement);
         if (!FileCommands.exists(input.directory)
-                || FileUtil.directoryIsEmpty(input.directory)) {
+                || FileUtil.isDirectoryEmpty(input.directory)) {
             GitHandler.cloneRepository(input);
             if(input.bound != null) {
                 GitHandler.resetRepoToCommit(input.directory,

@@ -6,7 +6,7 @@ import java.io.File;
 
 public class FileUtil {
 
-    public static boolean directoryIsEmpty(File directory) {
+    public static boolean isDirectoryEmpty(File directory) {
         return FileCommands.listFilesRecursive(directory.toPath()).size() == 0;
     }
 

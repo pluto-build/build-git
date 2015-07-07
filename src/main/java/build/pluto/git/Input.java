@@ -42,7 +42,7 @@ public class Input implements Serializable {
         if (!GitHandler.isUrlAccessible(url)) {
             return false;
         }
-        if (!FileUtil.directoryIsEmpty(directory)) {
+        if (!FileUtil.isDirectoryEmpty(directory)) {
             if (GitHandler.isRepo(directory)) {
                 return GitHandler.isUrlSet(directory, url);
             }
