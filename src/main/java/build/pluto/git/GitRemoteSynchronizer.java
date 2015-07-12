@@ -63,7 +63,8 @@ public class GitRemoteSynchronizer extends Builder<Input, None> {
             = FileCommands.listFilesRecursive(input.directory.toPath());
         File gitDirectory = new File(input.directory, ".git");
         for (Path p : outputFiles) {
-            if (!FileUtil.containsFile(gitDirectory, p.toFile())) {
+            if (!FileUtil.containsFile(gitDirectory, p.toFile())
+                    && !p.toFile().equals(persistentPath(input))) {
                 provide(p.toFile());
             }
         }
