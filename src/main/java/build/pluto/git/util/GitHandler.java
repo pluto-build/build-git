@@ -15,7 +15,11 @@ import org.eclipse.jgit.api.errors.NotMergedException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.StoredConfig;
+import org.eclipse.jgit.treewalk.FileTreeIterator;
+import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.treewalk.WorkingTreeIterator;
 import org.eclipse.jgit.transport.FetchResult;
+import org.eclipse.jgit.lib.Repository;
 
 import java.io.File;
 import java.io.IOException;
@@ -229,5 +233,31 @@ public class GitHandler {
             return null;
         }
         return null;
+    }
+
+    public static List<File> getNotIgnoredFilesOfRepo(File directory) {
+        Git git = openRepository(directory);
+        Repository repo = null;
+        repo = git.getRepository();
+        List<File> foundFiles = new ArrayList<>();
+        try {
+            FileTreeIterator tree = new FileTreeIterator(repo);
+            TreeWalk treeWalk = new TreeWalk(repo);
+            treeWalk.addTree(tree);
+            treeWalk.setRecursive(false);
+            while (treeWalk.next()) {
+                WorkingTreeIterator iterator = treeWalk.getTree(0, WorkingTreeIterator.class);
+                if(!iterator.isEntryIgnored())
+                    if (treeWalk.isSubtree()) {
+                        treeWalk.enterSubtree();
+                    } else {
+                        File file = new File(directory, treeWalk.getPathString());
+                        foundFiles.add(file);
+                    }
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return foundFiles;
     }
 }

@@ -58,15 +58,9 @@ public class GitRemoteSynchronizer extends Builder<Input, None> {
             GitHandler.pull(input);
         }
 
-        //TODO: maybe only provide files not ignored by .gitignore
-        List<Path> outputFiles
-            = FileCommands.listFilesRecursive(input.directory.toPath());
-        File gitDirectory = new File(input.directory, ".git");
-        for (Path p : outputFiles) {
-            if (!FileUtil.containsFile(gitDirectory, p.toFile())
-                    && !p.toFile().equals(persistentPath(input))) {
-                provide(p.toFile());
-            }
+        List<File> outputFiles = GitHandler.getNotIgnoredFilesOfRepo(input.directory);
+        for(File f : outputFiles) {
+            this.provide(f);
         }
         return None.val;
     }

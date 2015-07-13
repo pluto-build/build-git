@@ -21,6 +21,7 @@ import org.sugarj.common.FileCommands;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -173,6 +174,41 @@ public class GitHandlerTest {
         UpdateBound bound = new BranchBound(dummyPath, "feature");
         String s = GitHandler.getHashOfBound(dummyPath, bound);
         assertEquals(featureHeadHash, s);
+    }
+
+    @Test
+    public void checkGetNotIgnoredFilesOfRepoCorrectSize() {
+        clone(in);
+        List<File> foundFiles = GitHandler.getNotIgnoredFilesOfRepo(in.directory);
+        assertEquals(foundFiles.size(), 2);
+    }
+
+    @Test
+    public void checkListsUntrackedFiles() {
+        clone(in);
+        try{
+            File dummyFile = new File(in.directory, "dummyFile.txt");
+            FileCommands.createFile(dummyFile);
+            List<File> foundFiles = GitHandler.getNotIgnoredFilesOfRepo(in.directory);
+            assertEquals(foundFiles.size(), 3);
+        } catch (IOException e) {
+            fail("Could not create file");
+        }
+    }
+
+    @Test
+    public void checkListOnlyNotIgnoredFiles() {
+        clone(in);
+        try{
+            File tempDir = new File(in.directory, "temp");
+            File dummyFile = new File(tempDir, "ok.txt");
+            FileCommands.createDir(tempDir.toPath());
+            FileCommands.createFile(dummyFile);
+            List<File> foundFiles = GitHandler.getNotIgnoredFilesOfRepo(in.directory);
+            assertEquals(foundFiles.size(), 2);
+        } catch (IOException e) {
+            fail("Could not create file");
+        }
     }
 
     private void clone(Input input) {
