@@ -9,9 +9,11 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.ObjectInputStream;
+import java.io.IOException;
 
-public class Input implements Serializable {
-    private static final long serialVersionUID = -1L;
+public class GitInput implements Serializable {
+    private static final long serialVersionUID = 23456L;
     public final File directory;
     public final String url;
     public final File summaryLocation;
@@ -23,9 +25,10 @@ public class Input implements Serializable {
     public final boolean createMergeCommit;
     public final boolean squashCommit;
     public final UpdateBound bound;
+    public transient long consistencyCheckInterval;
 
 
-    private Input(Builder builder) {
+    private GitInput(Builder builder) {
         this.directory = builder.directory;
         this.url = builder.url;
         this.summaryLocation = builder.summaryLocation;
@@ -36,6 +39,7 @@ public class Input implements Serializable {
         this.createMergeCommit = builder.createMergeCommit;
         this.squashCommit = builder.squashCommit;
         this.bound = builder.bound;
+        this.consistencyCheckInterval = builder.consistencyCheckInterval;
     }
 
     public boolean isValid() {
@@ -63,6 +67,7 @@ public class Input implements Serializable {
         private boolean createMergeCommit = false;
         private boolean squashCommit = false;
         private UpdateBound bound = null;
+        private transient long consistencyCheckInterval = -1L;
 
         public Builder(File directory, String url, File summaryLocation) {
             this.directory = directory == null ? new File(".") : directory;
@@ -105,9 +110,21 @@ public class Input implements Serializable {
             this.bound = bound;
             return this;
         }
+        
+        public Builder setConsistencyCheckInterval(long consistencyCheckInterval) {
+            this.consistencyCheckInterval = consistencyCheckInterval;
+            return this;
+        }
 
-        public Input build() {
-            return new Input(this);
+        public GitInput build() {
+            return new GitInput(this);
         }
     }
+
+    // public void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+    //     consistencyCheckInterval = Long.MAX_VALUE;
+    //     System.out.println("READ GITINPUT");
+    //     ois.defaultReadObject();
+    // }
+    
 }

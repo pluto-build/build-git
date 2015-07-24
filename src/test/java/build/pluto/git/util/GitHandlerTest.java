@@ -1,6 +1,6 @@
 package build.pluto.git.util;
 
-import build.pluto.git.Input;
+import build.pluto.git.GitInput;
 import build.pluto.git.bound.UpdateBound;
 import build.pluto.git.bound.TagBound;
 import build.pluto.git.bound.BranchBound;
@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 
 public class GitHandlerTest {
 
-    private Input in;
+    private GitInput in;
     private String dummyPath;
     private final String featureHeadHash = "c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f";
     private final String masterHeadHash = "ddfa2acb09533f16792f6006316ce2744792d839";
@@ -211,7 +211,7 @@ public class GitHandlerTest {
         }
     }
 
-    private void clone(Input input) {
+    private void clone(GitInput input) {
         try {
             GitHandler.cloneRepository(input);
         } catch (NotClonedException e) {
@@ -219,9 +219,9 @@ public class GitHandlerTest {
         }
     }
 
-    private Input createInput(String local, String remote) {
+    private GitInput createInput(String local, String remote) {
         File localFile = new File(local);
-        Input.Builder inputBuilder = new Input.Builder(localFile, remote, null);
+        GitInput.Builder inputBuilder = new GitInput.Builder(localFile, remote, null);
         inputBuilder.addBranchToClone("feature");
         return inputBuilder.build();
     }

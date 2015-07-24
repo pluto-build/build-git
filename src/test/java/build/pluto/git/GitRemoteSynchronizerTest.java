@@ -1,5 +1,7 @@
 package build.pluto.git;
 
+import build.pluto.builder.BuildRequest;
+import build.pluto.builder.BuildManagers;
 import build.pluto.builder.RequiredBuilderFailed;
 import build.pluto.git.bound.BranchBound;
 import build.pluto.git.bound.CommitHashBound;
@@ -28,6 +30,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     private File directory;
     private File remoteLocation;
     private UpdateBound bound;
+    private long consistencyCheckInterval;
 
     private final String featureHeadHash = "c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f";
     private final String masterHeadHash = "ddfa2acb09533f16792f6006316ce2744792d839";
@@ -38,6 +41,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     public void init() {
         this.remoteLocation = new File("src/test/resources/dummy");
         this.bound = new BranchBound(getPathOfRemote(), "master");
+        this.consistencyCheckInterval = 0;
     }
 
     @Test
@@ -142,17 +146,17 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
         assertCorrectHead(master2HeadHash);
     }
 
-    private TrackingBuildManager build() throws IOException {
-        File binaryPath = null;
-        TrackingBuildManager manager = new TrackingBuildManager();
+    private void build() throws IOException {
         File summaryLocation = new File(directory, "temp");
-        Input.Builder inputBuilder = new Input.Builder(directory, getPathOfRemote(), summaryLocation);
+        GitInput.Builder inputBuilder = new GitInput.Builder(directory, getPathOfRemote(), summaryLocation);
         inputBuilder.addBranchToClone("master2");
         inputBuilder.addBranchToClone("feature");
         inputBuilder.setBound(this.bound);
-        Input input = inputBuilder.build();
-        manager.require(GitRemoteSynchronizer.factory, input);
-        return manager;
+        inputBuilder.setConsistencyCheckInterval(this.consistencyCheckInterval);
+        GitInput input = inputBuilder.build();
+        System.out.println("BUILD");
+        BuildRequest<?, ?, ?, ?> buildRequest = new BuildRequest(GitRemoteSynchronizer.factory, input);
+        BuildManagers.build(buildRequest);
     }
 
     private String getPathOfRemote() {

@@ -1,6 +1,6 @@
 package build.pluto.git.util;
 
-import build.pluto.git.Input;
+import build.pluto.git.GitInput;
 import build.pluto.git.bound.UpdateBound;
 import build.pluto.git.bound.CommitHashBound;
 import build.pluto.git.bound.BranchBound;
@@ -38,7 +38,7 @@ public class GitHandler {
         }
     }
 
-    public static void cloneRepository(Input input) throws NotClonedException {
+    public static void cloneRepository(GitInput input) throws NotClonedException {
         try {
             List<String> branchesToClone = new ArrayList<>();
             Git git = Git.cloneRepository()
@@ -71,7 +71,7 @@ public class GitHandler {
         }
     }
 
-    public static void pull(Input input) throws NotPulledException {
+    public static void pull(GitInput input) throws NotPulledException {
         FetchResult fetchResult = null;
         try {
             fetchResult = fetch(input.directory, input.url);
@@ -115,7 +115,7 @@ public class GitHandler {
         return null;
     }
 
-    private static MergeResult merge(Input input, Ref ref)
+    private static MergeResult merge(GitInput input, Ref ref)
             throws NotMergedException {
         try {
             Git git = openRepository(input.directory);
