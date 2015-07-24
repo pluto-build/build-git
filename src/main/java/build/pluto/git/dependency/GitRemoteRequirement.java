@@ -29,25 +29,15 @@ public class GitRemoteRequirement extends RemoteRequirement implements Serializa
         this.bound = bound;
         this.consistencyCheckInterval = consistencyCheckInterval;
         this.persistentPath = persistentPath;
-        if (!FileCommands.fileExists(persistentPath)) {
-            Thread currentThread = Thread.currentThread();
-            long currentTime = BuildManager.requireInitiallyTimeStamps.getOrDefault(currentThread, -1L);
-            createPersistentPath();
-        }
     }
-    
-    public void createPersistentPath() {
-        try {
-            FileCommands.createFile(persistentPath);
-        } catch(IOException e) {}
-    }
-    public void writePersistentPath(long timeStamp) {
-        System.out.println("NEW TS "+ timeStamp);
+
+    private void writePersistentPath(long timeStamp) {
         try {
             FileCommands.writeToFile(persistentPath, String.valueOf(timeStamp));
         } catch(IOException e) {}
     }
-    public long readPersistentPath() {
+
+    private long readPersistentPath() {
         try {
             String persistentPathContent = FileCommands.readFileAsString(persistentPath);
             return Long.parseLong(persistentPathContent.replace("\n", ""));
@@ -57,6 +47,7 @@ public class GitRemoteRequirement extends RemoteRequirement implements Serializa
         return -1L;
     }
 
+    public boolean isConsistentWithRemote() {
         if (!FileCommands.exists(directory)) {
             return false;
         }
@@ -79,15 +70,15 @@ public class GitRemoteRequirement extends RemoteRequirement implements Serializa
 
     @Override
     public boolean needsConsistencyCheck(long currentTime) {
-        // System.out.println("CHECK");
-        // long lastConsistencyCheck = readPersistentPath();
-        // System.out.println("CURR "+ currentTime);
-        // System.out.println("OLD "+ lastConsistencyCheck);
-        // if (lastConsistencyCheck + consistencyCheckInterval > currentTime) {
-        //     writePersistentPath(currentTime);
-        //     return true;
-        // }
-        return true;
+        if (!FileCommands.exists(persistentPath)) {
+           return true;
+        }
+        long lastConsistencyCheck = readPersistentPath();
+        if (lastConsistencyCheck + consistencyCheckInterval < currentTime) {
+            writePersistentPath(currentTime);
+            return true;
+        }
+        return false;
     }
 
     @Override

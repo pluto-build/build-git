@@ -1,8 +1,8 @@
 package build.pluto.git;
 
 import build.pluto.builder.Builder;
+import build.pluto.builder.BuildManager;
 import build.pluto.builder.BuilderFactory;
-import build.pluto.dependency.RemoteRequirement;
 import build.pluto.git.dependency.RemoteRequirement;
 import build.pluto.git.dependency.GitRemoteRequirement;
 import build.pluto.git.util.FileUtil;
@@ -42,10 +42,12 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
         if (!input.isValid()) {
             throw new IllegalArgumentException("GitInput was not correctly build.");
         }
+
+        File timeStampPersistentPath = new File(input.summaryLocation, "ts.dep");
         GitRemoteRequirement gitRequirement
-                = new GitRemoteRequirement(input.url, input.directory, input.bound, input.consistencyCheckInterval, new File(input.summaryLocation, "ts.dep"));
+                = new GitRemoteRequirement(input.url, input.directory, input.bound, input.consistencyCheckInterval, timeStampPersistentPath);
         this.requireOther(gitRequirement);
-        // this.require(gitRequirement.req.file, gitRequirement.req.stamp.getStamper());
+
         if (!FileCommands.exists(input.directory)
                 || FileUtil.isDirectoryEmpty(input.directory)) {
             GitHandler.cloneRepository(input);
@@ -58,6 +60,13 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
             GitHandler.pull(input);
         }
 
+        //Write timestamp to file
+        Thread currentThread = Thread.currentThread();
+        long currentTime = BuildManager.requireInitiallyTimeStamps.get(currentThread);
+        FileCommands.createFile(timeStampPersistentPath);
+        FileCommands.writeToFile(timeStampPersistentPath, String.valueOf(currentTime));
+
+        //provide files
         List<File> outputFiles = GitHandler.getNotIgnoredFilesOfRepo(input.directory);
         for(File f : outputFiles) {
             this.provide(f);
