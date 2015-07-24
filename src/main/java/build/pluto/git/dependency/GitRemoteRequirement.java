@@ -2,13 +2,19 @@ package build.pluto.git.dependency;
 
 import build.pluto.builder.BuildManager;
 import build.pluto.builder.BuildUnitProvider;
+import build.pluto.stamp.Stamper;
+import build.pluto.stamp.Stamp;
 import build.pluto.git.dependency.RemoteRequirement;
 import build.pluto.git.bound.UpdateBound;
 import build.pluto.git.util.GitHandler;
+import build.pluto.dependency.FileRequirement;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 import org.sugarj.common.FileCommands;
 

@@ -75,8 +75,8 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     }
 
     @Test
-    public void testDoNotCheckToEarly() throws IOException, InvalidRefNameException {
-        this.consistencyCheckInterval = 90000;
+    public void testDontCheckConsistencyToEarly() throws IOException, InvalidRefNameException {
+        this.consistencyCheckInterval = (long) 10e6;
         build();
         createCommitOnRemote();
         String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD(getPathOfRemote(), "master");
