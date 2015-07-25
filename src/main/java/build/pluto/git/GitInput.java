@@ -120,11 +120,4 @@ public class GitInput implements Serializable {
             return new GitInput(this);
         }
     }
-
-    // public void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-    //     consistencyCheckInterval = Long.MAX_VALUE;
-    //     System.out.println("READ GITINPUT");
-    //     ois.defaultReadObject();
-    // }
-    
 }
