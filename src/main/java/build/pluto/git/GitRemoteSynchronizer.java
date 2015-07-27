@@ -32,10 +32,12 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
 
     @Override
     protected File persistentPath(GitInput input) {
+        int urlHash = input.url.hashCode();
+        String fileName = "git-" + urlHash + ".dep";
         if (input.summaryLocation != null) {
-            return new File(input.summaryLocation, "git.dep");
+            return new File(input.summaryLocation, fileName);
         }
-        return new File("./git.dep");
+        return new File(fileName);
     }
 
     @Override
@@ -44,7 +46,9 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
             throw new IllegalArgumentException("GitInput was not correctly build.");
         }
 
-        File timeStampPersistentPath = new File(input.summaryLocation, "ts.dep");
+        int urlHash = input.url.hashCode();
+        String tsFileName = "git-" + urlHash + ".ts";
+        File timeStampPersistentPath = new File(input.summaryLocation, tsFileName);
         GitRemoteRequirement gitRequirement
                 = new GitRemoteRequirement(input.url, input.directory, input.bound, input.consistencyCheckInterval, timeStampPersistentPath);
         this.requireOther(gitRequirement);
