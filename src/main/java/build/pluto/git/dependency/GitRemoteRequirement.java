@@ -22,15 +22,13 @@ public class GitRemoteRequirement extends RemoteRequirement implements Serializa
 
     public static final long serialVersionUID = 12356L;
 
-    private String url;
     private File directory;
     private UpdateBound bound;
     private long consistencyCheckInterval;
 
     public File persistentPath;
 
-    public GitRemoteRequirement(String url, File directory, UpdateBound bound, long consistencyCheckInterval, File persistentPath) {
-        this.url = url;
+    public GitRemoteRequirement(File directory, UpdateBound bound, long consistencyCheckInterval, File persistentPath) {
         this.directory = directory;
         this.bound = bound;
         this.consistencyCheckInterval = consistencyCheckInterval;
@@ -89,6 +87,6 @@ public class GitRemoteRequirement extends RemoteRequirement implements Serializa
 
     @Override
     public String toString() {
-        return "GitRemoteReq(" + url + ", " + directory.toString() + ")";
+        return "GitRemoteReq(" + directory.toString() + ")";
     }
 }

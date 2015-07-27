@@ -50,7 +50,7 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
         String tsFileName = "git-" + urlHash + ".ts";
         File timeStampPersistentPath = new File(input.summaryLocation, tsFileName);
         GitRemoteRequirement gitRequirement
-                = new GitRemoteRequirement(input.url, input.directory, input.bound, input.consistencyCheckInterval, timeStampPersistentPath);
+                = new GitRemoteRequirement(input.directory, input.bound, input.consistencyCheckInterval, timeStampPersistentPath);
         this.requireOther(gitRequirement);
 
         if (!FileCommands.exists(input.directory)
