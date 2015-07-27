@@ -165,7 +165,6 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
         inputBuilder.setBound(this.bound);
         inputBuilder.setConsistencyCheckInterval(this.consistencyCheckInterval);
         GitInput input = inputBuilder.build();
-        System.out.println("BUILD");
         BuildRequest<?, ?, ?, ?> buildRequest = new BuildRequest(GitRemoteSynchronizer.factory, input);
         BuildManagers.build(buildRequest);
     }

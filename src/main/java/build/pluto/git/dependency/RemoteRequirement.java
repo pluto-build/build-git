@@ -16,7 +16,6 @@ public abstract class RemoteRequirement implements Requirement {
         Thread currentThread = Thread.currentThread();
         long timeStamp = BuildManager.requireInitiallyTimeStamps.getOrDefault(currentThread, 0L);
         if(needsConsistencyCheck(timeStamp)) {
-            System.out.println("CHECK REMOTE");
             return isConsistentWithRemote();
         }
         return true;
