@@ -2,6 +2,10 @@ package build.pluto.git.bound;
 
 import build.pluto.git.util.GitHandler;
 
+/**
+ * Indicates that the repository only gets updated until its HEAD is tag.
+ *
+ */
 public class TagBound implements UpdateBound {
 
     private final String remote;

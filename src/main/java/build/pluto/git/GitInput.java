@@ -67,6 +67,11 @@ public class GitInput implements Serializable {
         private UpdateBound bound = null;
         private transient long consistencyCheckInterval = -1L;
 
+        /**
+         * @param directory in which the repository gets cloned into.
+         * @param url which remote repository gets cloned.
+         * @param summaryLocation where the build summary is saved.
+         */
         public Builder(File directory, String url, File summaryLocation) {
             this.directory = directory == null ? new File(".") : directory;
             this.url = url;
@@ -74,41 +79,76 @@ public class GitInput implements Serializable {
             this.bound = new BranchBound(url, "master");
         }
 
+        /**
+         * Adds a branch thats get cloned when the builder is first executed.
+         *
+         * @param branchName the name of the branch you want to get cloned.
+         */
         public Builder addBranchToClone(String branchName) {
             this.branchesToClone.add(branchName);
             return this;
         }
 
+        /**
+         * @param cloneSubmodules true if you want to get the submodules get
+         * cloned. The default is false.
+         */
         public Builder setCloneSubmodules(boolean cloneSubmodules) {
             this.cloneSubmodules = cloneSubmodules;
             return this;
         }
 
+        /**
+         * @param ffMode indicates the mode you want the fast forward to happen.
+         * You can choose between  FF, FF_ONLY, and NO_FF. The default is FF_ONLY.
+         */
         public Builder setFfMode(FastForwardMode ffMode) {
             this.ffMode = ffMode;
             return this;
         }
 
+        /**
+         * @param mergeStrategy is the strategy in which merges get performed.
+         * You can choose between OURS, RECURSIVE,RESOLVE, SIMPLE_TWO_WAY_IN_CORE
+         * and THREIS. The default is RESOLVE.
+         */
         public Builder setMergeStrategy(MergeStrategy mergeStrategy) {
             this.mergeStrategy = mergeStrategy;
             return this;
         }
 
+        /**
+         * @param createMergeCommit is true if you want a commit to be created
+         * if a merge gets performed. The default is false.
+         */
         public Builder setCreateMergeCommit(boolean createMergeCommit) {
             this.createMergeCommit = createMergeCommit;
             return this;
         }
-
+        /**
+         *
+         * @param squashCommit is true if a merge gets performed a squash also
+         * gets performed. The default is false.
+         */
         public Builder setSquashCommit(boolean squashCommit) {
             this.squashCommit = squashCommit;
             return this;
         }
 
+        /**
+         * @param bound is the bound of repository that it has to follow.
+         * The default is the master branch.
+         */
         public Builder setBound(UpdateBound bound) {
             this.bound = bound;
             return this;
         }
-        
+
+        /**
+         * @param consistencyCheckInterval how long the builder waits til the
+         * consistency of the builder gets checked again in milliseconds.
+         * The default is 0;
+         */
         public Builder setConsistencyCheckInterval(long consistencyCheckInterval) {
             this.consistencyCheckInterval = consistencyCheckInterval;
             return this;

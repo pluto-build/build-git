@@ -1,5 +1,10 @@
 package build.pluto.git.bound;
 
+/**
+ * Indicates that the repository only gets updated until its HEAD is the
+ * commit with the hash commitHash.
+ *
+ */
 public class CommitHashBound implements UpdateBound {
 
     private final String commitHash;
