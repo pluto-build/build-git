@@ -1,7 +1,7 @@
 package build.pluto.git;
 
-import build.pluto.builder.BuildRequest;
 import build.pluto.builder.BuildManagers;
+import build.pluto.builder.BuildRequest;
 import build.pluto.builder.RequiredBuilderFailed;
 import build.pluto.git.bound.BranchBound;
 import build.pluto.git.bound.CommitHashBound;
@@ -10,7 +10,6 @@ import build.pluto.git.bound.UpdateBound;
 import build.pluto.git.util.GitHandler;
 import build.pluto.test.build.ScopedBuildTest;
 import build.pluto.test.build.ScopedPath;
-import build.pluto.test.build.TrackingBuildManager;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;

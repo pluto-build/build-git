@@ -1,25 +1,28 @@
 package build.pluto.git.util;
 
 import build.pluto.git.GitInput;
-import build.pluto.git.bound.UpdateBound;
-import build.pluto.git.bound.CommitHashBound;
 import build.pluto.git.bound.BranchBound;
+import build.pluto.git.bound.CommitHashBound;
+import build.pluto.git.bound.UpdateBound;
 import build.pluto.git.exception.NotCheckedOutException;
 import build.pluto.git.exception.NotClonedException;
 import build.pluto.git.exception.NotFetchedException;
 import build.pluto.git.exception.NotPulledException;
-import org.eclipse.jgit.api.*;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.MergeCommand;
+import org.eclipse.jgit.api.MergeResult;
+import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.api.errors.NotMergedException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
+import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.treewalk.FileTreeIterator;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.WorkingTreeIterator;
-import org.eclipse.jgit.transport.FetchResult;
-import org.eclipse.jgit.lib.Repository;
 
 import java.io.File;
 import java.io.IOException;
