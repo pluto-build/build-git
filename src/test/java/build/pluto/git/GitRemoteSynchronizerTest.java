@@ -157,8 +157,8 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     }
 
     private void build() throws IOException {
-        File summaryLocation = new File(directory, "temp");
-        GitInput.Builder inputBuilder = new GitInput.Builder(directory, getPathOfRemote(), summaryLocation);
+        GitInput.Builder inputBuilder =
+            new GitInput.Builder(directory, getPathOfRemote());
         inputBuilder.addBranchToClone("master2");
         inputBuilder.addBranchToClone("feature");
         inputBuilder.setBound(this.bound);

@@ -221,7 +221,7 @@ public class GitHandlerTest {
 
     private GitInput createInput(String local, String remote) {
         File localFile = new File(local);
-        GitInput.Builder inputBuilder = new GitInput.Builder(localFile, remote, null);
+        GitInput.Builder inputBuilder = new GitInput.Builder(localFile, remote);
         inputBuilder.addBranchToClone("feature");
         return inputBuilder.build();
     }
