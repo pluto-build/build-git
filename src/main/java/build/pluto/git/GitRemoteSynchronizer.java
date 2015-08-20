@@ -1,21 +1,17 @@
 package build.pluto.git;
 
-import build.pluto.builder.Builder;
-import build.pluto.builder.BuildManager;
 import build.pluto.builder.BuilderFactory;
-import build.pluto.git.dependency.RemoteRequirement;
+import build.pluto.builder.RemoteAccessBuilder;
 import build.pluto.git.dependency.GitRemoteRequirement;
 import build.pluto.git.util.FileUtil;
 import build.pluto.git.util.GitHandler;
 import build.pluto.output.None;
-
-import java.io.File;
-import java.util.concurrent.TimeUnit;
-import java.util.List;
-
 import org.sugarj.common.FileCommands;
 
-public class GitRemoteSynchronizer extends Builder<GitInput, None> {
+import java.io.File;
+import java.util.List;
+
+public class GitRemoteSynchronizer extends RemoteAccessBuilder<GitInput, None> {
 
     public static BuilderFactory<GitInput, None, GitRemoteSynchronizer> factory
         = BuilderFactory.of(GitRemoteSynchronizer.class, GitInput.class);
@@ -41,16 +37,21 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
     }
 
     @Override
-    protected None build(GitInput input) throws Throwable {
+    protected File timestampPersistentPath(GitInput input) {
+        int urlHash = input.url.hashCode();
+        String tsFileName = "git-" + urlHash + ".ts";
+        File baseDir = input.summaryLocation != null ? input.summaryLocation : new File(".");
+        return new File(input.summaryLocation, tsFileName);
+    }
+
+    @Override
+    protected None build(GitInput input, File tsPersistentPath) throws Throwable {
         if (!input.isValid()) {
             throw new IllegalArgumentException("GitInput was not correctly build.");
         }
 
-        int urlHash = input.url.hashCode();
-        String tsFileName = "git-" + urlHash + ".ts";
-        File timeStampPersistentPath = new File(input.summaryLocation, tsFileName);
         GitRemoteRequirement gitRequirement
-                = new GitRemoteRequirement(input.directory, input.bound, input.consistencyCheckInterval, timeStampPersistentPath);
+                = new GitRemoteRequirement(input.directory, input.bound, input.consistencyCheckInterval, tsPersistentPath);
         this.requireOther(gitRequirement);
 
         if (!FileCommands.exists(input.directory)
@@ -64,12 +65,6 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
             GitHandler.checkout(input.directory, input.bound.getBound());
             GitHandler.pull(input);
         }
-
-        //Write timestamp to file
-        Thread currentThread = Thread.currentThread();
-        long currentTime = BuildManager.requireInitiallyTimeStamps.get(currentThread);
-        FileCommands.createFile(timeStampPersistentPath);
-        FileCommands.writeToFile(timeStampPersistentPath, String.valueOf(currentTime));
 
         //provide files
         List<File> outputFiles = GitHandler.getNotIgnoredFilesOfRepo(input.directory);

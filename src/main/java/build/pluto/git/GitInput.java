@@ -1,16 +1,14 @@
 package build.pluto.git;
 
-import build.pluto.git.bound.UpdateBound;
 import build.pluto.git.bound.BranchBound;
-import build.pluto.git.util.GitHandler;
+import build.pluto.git.bound.UpdateBound;
 import build.pluto.git.util.FileUtil;
+import build.pluto.git.util.GitHandler;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.ObjectInputStream;
-import java.io.IOException;
 
 public class GitInput implements Serializable {
     private static final long serialVersionUID = 23456L;
