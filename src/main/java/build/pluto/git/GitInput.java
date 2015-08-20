@@ -38,19 +38,6 @@ public class GitInput implements Serializable {
         this.consistencyCheckInterval = builder.consistencyCheckInterval;
     }
 
-    public boolean isValid() {
-        if (!GitHandler.isUrlAccessible(url)) {
-            return false;
-        }
-        if (!FileUtil.isDirectoryEmpty(directory)) {
-            if (GitHandler.isRepo(directory)) {
-                return GitHandler.isUrlSet(directory, url);
-            }
-            return false;
-        }
-        return true;
-    }
-
     public static class Builder {
         private final File directory;
         private final String url;

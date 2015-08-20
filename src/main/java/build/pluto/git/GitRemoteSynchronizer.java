@@ -1,7 +1,7 @@
 package build.pluto.git;
 
 import build.pluto.builder.BuilderFactory;
-import build.pluto.builder.RemoteAccessBuilder;
+import build.pluto.builder.Builder;
 import build.pluto.git.dependency.GitRemoteRequirement;
 import build.pluto.git.util.FileUtil;
 import build.pluto.git.util.GitHandler;
@@ -11,7 +11,7 @@ import org.sugarj.common.FileCommands;
 import java.io.File;
 import java.util.List;
 
-public class GitRemoteSynchronizer extends RemoteAccessBuilder<GitInput, None> {
+public class GitRemoteSynchronizer extends Builder<GitInput, None> {
 
     public static BuilderFactory<GitInput, None, GitRemoteSynchronizer> factory
         = BuilderFactory.of(GitRemoteSynchronizer.class, GitInput.class);
@@ -32,21 +32,16 @@ public class GitRemoteSynchronizer extends RemoteAccessBuilder<GitInput, None> {
     }
 
     @Override
-    protected File timestampPersistentPath(GitInput input) {
-        int urlHash = input.url.hashCode();
-        String tsFileName = "git-" + urlHash + ".ts";
-        File baseDir = input.summaryLocation != null ? input.summaryLocation : new File(".");
-        return new File(input.summaryLocation, tsFileName);
-    }
-
-    @Override
-    protected None build(GitInput input, File tsPersistentPath) throws Throwable {
-        if (!input.isValid()) {
+    protected None build(GitInput input) throws Throwable {
+        if (!isInputValid(input)) {
             throw new IllegalArgumentException("GitInput was not correctly build.");
         }
-
-        GitRemoteRequirement gitRequirement
-                = new GitRemoteRequirement(input.directory, input.bound, input.consistencyCheckInterval, tsPersistentPath);
+        File tsPersistentPath = new File(input.directory, ".git/git.dep.time");
+        GitRemoteRequirement gitRequirement = new GitRemoteRequirement(
+                input.directory,
+                input.bound,
+                input.consistencyCheckInterval,
+                tsPersistentPath);
         this.requireOther(gitRequirement);
 
         if (!FileCommands.exists(input.directory)
@@ -67,5 +62,18 @@ public class GitRemoteSynchronizer extends RemoteAccessBuilder<GitInput, None> {
             this.provide(f);
         }
         return None.val;
+    }
+
+    private boolean isInputValid(GitInput input) {
+        if (!GitHandler.isUrlAccessible(input.url)) {
+            return false;
+        }
+        if (!FileUtil.isDirectoryEmpty(input.directory)) {
+            if (GitHandler.isRepo(input.directory)) {
+                return GitHandler.isUrlSet(input.directory, input.url);
+            }
+            return false;
+        }
+        return true;
     }
 }
