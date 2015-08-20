@@ -14,7 +14,6 @@ public class GitInput implements Serializable {
     private static final long serialVersionUID = 23456L;
     public final File directory;
     public final String url;
-    public final File summaryLocation;
 
     public final List<String> branchesToClone;
     public final boolean cloneSubmodules;
@@ -29,7 +28,6 @@ public class GitInput implements Serializable {
     private GitInput(Builder builder) {
         this.directory = builder.directory;
         this.url = builder.url;
-        this.summaryLocation = builder.summaryLocation;
         this.branchesToClone = builder.branchesToClone;
         this.cloneSubmodules = builder.cloneSubmodules;
         this.ffMode = builder.ffMode;
@@ -56,7 +54,6 @@ public class GitInput implements Serializable {
     public static class Builder {
         private final File directory;
         private final String url;
-        private final File summaryLocation;
 
         private List<String> branchesToClone = new ArrayList<>();
         private boolean cloneSubmodules = false;
@@ -70,12 +67,10 @@ public class GitInput implements Serializable {
         /**
          * @param directory in which the repository gets cloned into.
          * @param url which remote repository gets cloned.
-         * @param summaryLocation where the build summary is saved.
          */
-        public Builder(File directory, String url, File summaryLocation) {
+        public Builder(File directory, String url) {
             this.directory = directory == null ? new File(".") : directory;
             this.url = url;
-            this.summaryLocation = summaryLocation == null ? new File(".") : summaryLocation;
             this.bound = new BranchBound(url, "master");
         }
 

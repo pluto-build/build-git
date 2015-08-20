@@ -28,12 +28,7 @@ public class GitRemoteSynchronizer extends RemoteAccessBuilder<GitInput, None> {
 
     @Override
     protected File persistentPath(GitInput input) {
-        int urlHash = input.url.hashCode();
-        String fileName = "git-" + urlHash + ".dep";
-        if (input.summaryLocation != null) {
-            return new File(input.summaryLocation, fileName);
-        }
-        return new File(fileName);
+        return new File(input.directory, ".git/git.dep");
     }
 
     @Override
