@@ -22,6 +22,6 @@ public class CommitHashBound implements UpdateBound {
     }
 
     public boolean reachedBound(String currentHash) {
-        return currentHash.equals(commitHash); 
+        return currentHash.equals(commitHash);
     }
 }

@@ -15,7 +15,7 @@ public class TagBound implements UpdateBound {
         this.remote = remote;
         this.tag = tag;
     }
-    
+
     public String getBound() {
         return this.tag;
     }
