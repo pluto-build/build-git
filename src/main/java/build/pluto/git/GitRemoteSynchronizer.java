@@ -37,12 +37,6 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
             throw new IllegalArgumentException("GitInput was not correctly build.");
         }
         File tsPersistentPath = new File(input.directory, ".git/git.dep.time");
-        GitRemoteRequirement gitRequirement = new GitRemoteRequirement(
-                input.directory,
-                input.bound,
-                input.consistencyCheckInterval,
-                tsPersistentPath);
-        this.requireOther(gitRequirement);
 
         if (!FileCommands.exists(input.directory)
                 || FileUtil.isDirectoryEmpty(input.directory)) {
@@ -55,6 +49,16 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
             GitHandler.checkout(input.directory, input.bound.getBound());
             GitHandler.pull(input);
         }
+
+        //need to create requirement after the repo gets cloned because
+        //the directory contains git.time.dep inside of .git when the
+        //constructor gets called
+        GitRemoteRequirement gitRequirement = new GitRemoteRequirement(
+                input.directory,
+                input.bound,
+                input.consistencyCheckInterval,
+                tsPersistentPath);
+        this.requireOther(gitRequirement);
 
         //provide files
         List<File> outputFiles = GitHandler.getNotIgnoredFilesOfRepo(input.directory);
