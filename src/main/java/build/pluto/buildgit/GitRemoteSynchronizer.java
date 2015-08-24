@@ -1,10 +1,10 @@
-package build.pluto.git;
+package build.pluto.buildgit;
 
 import build.pluto.builder.BuilderFactory;
 import build.pluto.builder.Builder;
-import build.pluto.git.dependency.GitRemoteRequirement;
-import build.pluto.git.util.FileUtil;
-import build.pluto.git.util.GitHandler;
+import build.pluto.buildgit.dependency.GitRemoteRequirement;
+import build.pluto.buildgit.util.FileUtil;
+import build.pluto.buildgit.util.GitHandler;
 import build.pluto.output.None;
 import org.sugarj.common.FileCommands;
 

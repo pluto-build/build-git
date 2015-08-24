@@ -1,9 +1,9 @@
-package build.pluto.git.dependency;
+package build.pluto.buildgit.dependency;
 
 import build.pluto.builder.BuildUnitProvider;
 import build.pluto.dependency.RemoteRequirement;
-import build.pluto.git.bound.UpdateBound;
-import build.pluto.git.util.GitHandler;
+import build.pluto.buildgit.bound.UpdateBound;
+import build.pluto.buildgit.util.GitHandler;
 import org.sugarj.common.FileCommands;
 
 import java.io.File;

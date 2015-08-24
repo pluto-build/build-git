@@ -1,4 +1,4 @@
-package build.pluto.git.exception;
+package build.pluto.buildgit.exception;
 
 public class NotFetchedException extends Exception {
 }

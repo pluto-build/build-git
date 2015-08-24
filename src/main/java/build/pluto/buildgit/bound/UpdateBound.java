@@ -1,4 +1,4 @@
-package build.pluto.git.bound;
+package build.pluto.buildgit.bound;
 
 import java.io.Serializable;
 

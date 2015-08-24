@@ -1,4 +1,4 @@
-package build.pluto.git.util;
+package build.pluto.buildgit.util;
 
 import org.junit.After;
 import org.junit.Test;

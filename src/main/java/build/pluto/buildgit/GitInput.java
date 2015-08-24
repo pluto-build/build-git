@@ -1,9 +1,7 @@
-package build.pluto.git;
+package build.pluto.buildgit;
 
-import build.pluto.git.bound.BranchBound;
-import build.pluto.git.bound.UpdateBound;
-import build.pluto.git.util.FileUtil;
-import build.pluto.git.util.GitHandler;
+import build.pluto.buildgit.bound.BranchBound;
+import build.pluto.buildgit.bound.UpdateBound;
 
 import java.io.File;
 import java.io.Serializable;

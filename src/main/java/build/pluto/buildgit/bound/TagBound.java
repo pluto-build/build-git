@@ -1,6 +1,6 @@
-package build.pluto.git.bound;
+package build.pluto.buildgit.bound;
 
-import build.pluto.git.util.GitHandler;
+import build.pluto.buildgit.util.GitHandler;
 
 /**
  * Indicates that the repository only gets updated until its HEAD is tag.

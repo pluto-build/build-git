@@ -1,4 +1,4 @@
-package build.pluto.git;
+package build.pluto.buildgit;
 
 
 public enum MergeStrategy {

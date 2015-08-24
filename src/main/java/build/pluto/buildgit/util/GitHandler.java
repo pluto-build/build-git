@@ -1,13 +1,13 @@
-package build.pluto.git.util;
+package build.pluto.buildgit.util;
 
-import build.pluto.git.GitInput;
-import build.pluto.git.bound.BranchBound;
-import build.pluto.git.bound.CommitHashBound;
-import build.pluto.git.bound.UpdateBound;
-import build.pluto.git.exception.NotCheckedOutException;
-import build.pluto.git.exception.NotClonedException;
-import build.pluto.git.exception.NotFetchedException;
-import build.pluto.git.exception.NotPulledException;
+import build.pluto.buildgit.GitInput;
+import build.pluto.buildgit.bound.BranchBound;
+import build.pluto.buildgit.bound.CommitHashBound;
+import build.pluto.buildgit.bound.UpdateBound;
+import build.pluto.buildgit.exception.NotCheckedOutException;
+import build.pluto.buildgit.exception.NotClonedException;
+import build.pluto.buildgit.exception.NotFetchedException;
+import build.pluto.buildgit.exception.NotPulledException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.MergeResult;

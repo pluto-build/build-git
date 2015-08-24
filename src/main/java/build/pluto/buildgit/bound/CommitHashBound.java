@@ -1,4 +1,4 @@
-package build.pluto.git.bound;
+package build.pluto.buildgit.bound;
 
 /**
  * Indicates that the repository only gets updated until its HEAD is the
