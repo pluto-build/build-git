@@ -1,6 +1,7 @@
 package build.pluto.buildgit;
 
 import build.pluto.builder.BuilderFactory;
+import build.pluto.builder.BuilderFactoryFactory;
 import build.pluto.builder.Builder;
 import build.pluto.buildgit.dependency.GitRemoteRequirement;
 import build.pluto.buildgit.util.FileUtil;
@@ -14,7 +15,7 @@ import java.util.List;
 public class GitRemoteSynchronizer extends Builder<GitInput, None> {
 
     public static BuilderFactory<GitInput, None, GitRemoteSynchronizer> factory
-        = BuilderFactory.of(GitRemoteSynchronizer.class, GitInput.class);
+        = BuilderFactoryFactory.of(GitRemoteSynchronizer.class, GitInput.class);
 
     public GitRemoteSynchronizer(GitInput input) {
         super(input);
@@ -27,7 +28,7 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
     }
 
     @Override
-    protected File persistentPath(GitInput input) {
+    public File persistentPath(GitInput input) {
         return new File(input.directory, ".git/git.dep");
     }
 
