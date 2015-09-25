@@ -34,11 +34,7 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
 
     @Override
     protected None build(GitInput input) throws Throwable {
-        if (!isInputValid(input)) {
-            throw new IllegalArgumentException("GitInput was not correctly build.");
-        }
-        File tsPersistentPath = new File(input.directory, ".git/git.dep.time");
-
+        isInputValid(input);
         if (!FileCommands.exists(input.directory)
                 || FileUtil.isDirectoryEmpty(input.directory)) {
             GitHandler.cloneRepository(input);
@@ -54,6 +50,7 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
         //need to create requirement after the repo gets cloned because
         //the directory contains git.time.dep inside of .git when the
         //constructor gets called
+        File tsPersistentPath = new File(input.directory, ".git/git.dep.time");
         GitRemoteRequirement gitRequirement = new GitRemoteRequirement(
                 input.directory,
                 input.bound,
@@ -69,16 +66,19 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
         return None.val;
     }
 
-    private boolean isInputValid(GitInput input) {
+    private void isInputValid(GitInput input) {
         if (!GitHandler.isUrlAccessible(input.url)) {
-            return false;
+            throw new IllegalArgumentException(input.url + " can not be accessed");
         }
         if (!FileUtil.isDirectoryEmpty(input.directory)) {
             if (GitHandler.isRepo(input.directory)) {
-                return GitHandler.isUrlSet(input.directory, input.url);
+                boolean isUrlSet = GitHandler.isUrlSet(input.directory, input.url);
+                if(!isUrlSet) {
+                    throw new IllegalArgumentException(input.directory + " has " + input.url + " not set as remote");
+                }
+            } else {
+                throw new IllegalArgumentException(input.directory + " contains other data");
             }
-            return false;
         }
-        return true;
     }
 }
