@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GitInput implements Serializable {
-    private static final long serialVersionUID = 23456L;
+    private static final long serialVersionUID = 1115081253158794260L;
+
     public final File directory;
     public final String url;
 

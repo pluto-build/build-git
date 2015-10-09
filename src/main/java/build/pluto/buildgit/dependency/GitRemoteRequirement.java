@@ -12,8 +12,6 @@ import java.io.Serializable;
 
 public class GitRemoteRequirement extends RemoteRequirement implements Serializable {
 
-    public static final long serialVersionUID = 12356L;
-
     private File directory;
     private UpdateBound bound;
 
