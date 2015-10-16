@@ -44,7 +44,11 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
             }
         } else {
             GitHandler.checkout(input.directory, input.bound.getBound());
-            GitHandler.pull(input);
+            // do not pull if no connection can be made so the builder does
+            // not fail
+            if(GitHandler.isUrlAccessible(input.url)) {
+                GitHandler.pull(input);
+            }
         }
 
         //need to create requirement after the repo gets cloned because
@@ -67,18 +71,20 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
     }
 
     private void isInputValid(GitInput input) {
-        if (!GitHandler.isUrlAccessible(input.url)) {
-            throw new IllegalArgumentException(input.url + " can not be accessed");
-        }
         if (!FileUtil.isDirectoryEmpty(input.directory)) {
             if (GitHandler.isRepo(input.directory)) {
                 boolean isUrlSet = GitHandler.isUrlSet(input.directory, input.url);
                 if(!isUrlSet) {
                     throw new IllegalArgumentException(input.directory + " has " + input.url + " not set as remote");
+                } else {
+                    return;
                 }
             } else {
                 throw new IllegalArgumentException(input.directory + " contains other data");
             }
+        }
+        if (!GitHandler.isUrlAccessible(input.url)) {
+            throw new IllegalArgumentException(input.url + " can not be accessed");
         }
     }
 }
