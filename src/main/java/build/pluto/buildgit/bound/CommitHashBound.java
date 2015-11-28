@@ -20,8 +20,4 @@ public class CommitHashBound implements UpdateBound {
     public String getBoundHash() {
         return this.commitHash;
     }
-
-    public boolean reachedBound(String currentHash) {
-        return currentHash.equals(commitHash);
-    }
 }

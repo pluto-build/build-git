@@ -25,8 +25,4 @@ public class BranchBound implements UpdateBound {
         String hashOfBranchHEAD = GitHandler.getHashOfRemoteHEAD(remote, branchName);
         return hashOfBranchHEAD;
     }
-
-    public boolean reachedBound(String currentHash) {
-        return currentHash.equals(getBoundHash());
-    }
 }

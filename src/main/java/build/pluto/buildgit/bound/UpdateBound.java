@@ -9,5 +9,7 @@ import java.io.Serializable;
 public interface UpdateBound extends Serializable {
     public String getBound();
     public String getBoundHash();
-    public boolean reachedBound(String currentHash);
+    public default boolean reachedBound(String currentHash) {
+        return getBoundHash().equals(currentHash);
+    }
 }

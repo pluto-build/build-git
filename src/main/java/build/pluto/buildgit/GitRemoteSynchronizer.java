@@ -58,6 +58,7 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
         GitRemoteRequirement gitRequirement = new GitRemoteRequirement(
                 input.directory,
                 input.bound,
+                input.url,
                 input.consistencyCheckInterval,
                 tsPersistentPath);
         this.requireOther(gitRequirement);

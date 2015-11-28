@@ -1,24 +1,32 @@
 package build.pluto.buildgit.dependency;
 
 import build.pluto.builder.BuildUnitProvider;
-import build.pluto.dependency.RemoteRequirement;
 import build.pluto.buildgit.bound.UpdateBound;
+import build.pluto.buildgit.util.FileUtil;
 import build.pluto.buildgit.util.GitHandler;
-import org.sugarj.common.FileCommands;
+import build.pluto.dependency.RemoteRequirement;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.sugarj.common.FileCommands;
+
 public class GitRemoteRequirement extends RemoteRequirement implements Serializable {
 
     private File directory;
     private UpdateBound bound;
+    private String url;
 
-    public GitRemoteRequirement(File directory, UpdateBound bound, long consistencyCheckInterval, File persistentPath) {
+    public GitRemoteRequirement(File directory,
+            UpdateBound bound,
+            String url,
+            long consistencyCheckInterval,
+            File persistentPath) {
         super(persistentPath, consistencyCheckInterval);
         this.directory = directory;
         this.bound = bound;
+        this.url = url;
     }
 
 
@@ -36,6 +44,20 @@ public class GitRemoteRequirement extends RemoteRequirement implements Serializa
             return false;
         }
         return true;
+    }
+
+    @Override
+    protected boolean isRemoteResourceAccessible() {
+        return GitHandler.isUrlAccessible(url);
+    }
+
+    @Override
+    protected boolean isLocalResourceAvailable() {
+        if (!FileUtil.isDirectoryEmpty(directory)) {
+            boolean isUrlSet = GitHandler.isUrlSet(directory, url);
+            return isUrlSet;
+        }
+        return false;
     }
 
     @Override

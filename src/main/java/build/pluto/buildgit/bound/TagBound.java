@@ -24,8 +24,4 @@ public class TagBound implements UpdateBound {
         String hashOfTag = GitHandler.getHashOfBound(this.remote, this);
         return hashOfTag;
     }
-
-    public boolean reachedBound(String currentHash) {
-        return currentHash.equals(getBoundHash());
-    }
 }

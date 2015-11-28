@@ -55,7 +55,10 @@ public class GitInput implements Serializable {
          * @param url which remote repository gets cloned.
          */
         public Builder(File directory, String url) {
-            this.directory = directory == null ? new File(".") : directory;
+            if (directory == null || url == null){
+                throw new IllegalArgumentException("One of the arguments is null");
+            }
+            this.directory = directory;
             this.url = url;
             this.bound = new BranchBound(url, "master");
         }

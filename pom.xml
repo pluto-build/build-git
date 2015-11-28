@@ -5,11 +5,11 @@
     <artifactId>build-git</artifactId>
     <packaging>jar</packaging>
     <version>1.0.0-SNAPSHOT</version>
-    <parent>
-        <groupId>build.pluto</groupId>
-        <artifactId>maven-config-java</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
-    </parent>
+    <!-- <parent> -->
+    <!--     <groupId>build.pluto</groupId> -->
+    <!--     <artifactId>maven-config-java</artifactId> -->
+    <!--     <version>1.0.1-SNAPSHOT</version> -->
+    <!-- </parent> -->
     <build>
         <plugins>
             <plugin>
