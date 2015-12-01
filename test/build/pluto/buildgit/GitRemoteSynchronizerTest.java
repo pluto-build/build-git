@@ -39,7 +39,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
 
     @Before
     public void init() {
-        this.remoteLocation = new File("src/test/resources/dummy");
+        this.remoteLocation = new File("testdata/dummy");
         this.bound = new BranchBound(getPathOfRemote(), "master");
         this.consistencyCheckInterval = 0;
     }
