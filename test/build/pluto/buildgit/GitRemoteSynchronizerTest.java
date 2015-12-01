@@ -75,27 +75,27 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     }
 
     @Test
-    public void testDirectoryEmpty() throws IOException {
+    public void testDirectoryEmpty() throws Throwable {
         build();
         assertCorrectHead(masterHeadHash);
     }
 
-    @Test(expected = RequiredBuilderFailed.class)
-    public void testDirectoryNotEmpty() throws IOException {
+    @Test(expected = IllegalArgumentException.class)
+    public void testDirectoryNotEmpty() throws Throwable {
         File tempFile = new File(directory, "OK.txt");
         FileCommands.createFile(tempFile);
         build();
     }
 
     @Test
-    public void testCleanRebuildDoesNothing() throws IOException {
+    public void testCleanRebuildDoesNothing() throws Throwable {
         build();
         build();
         assertCorrectHead(masterHeadHash);
     }
 
     @Test
-    public void testNeedToPull() throws IOException, InvalidRefNameException {
+    public void testNeedToPull() throws Throwable, InvalidRefNameException {
         build();
         createCommitOnRemote();
         String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD(getPathOfRemote(), "master");
@@ -105,7 +105,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     }
 
     @Test
-    public void testDontCheckConsistencyToEarly() throws IOException, InvalidRefNameException {
+    public void testDontCheckConsistencyToEarly() throws Throwable, InvalidRefNameException {
         this.consistencyCheckInterval = (long) 10e6;
         build();
         createCommitOnRemote();
@@ -116,7 +116,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     }
 
     @Test
-    public void testPullAfterCheckout() throws Exception {
+    public void testPullAfterCheckout() throws Throwable {
         build();
         createCommitOnRemote();
         String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD(getPathOfRemote(), "master");
@@ -128,7 +128,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     }
 
     @Test
-    public void testBuildAfterCheckout() throws Exception {
+    public void testBuildAfterCheckout() throws Throwable {
         build();
         GitHandler.checkout(directory, "feature");
         assertCorrectHead(featureHeadHash);
@@ -136,21 +136,21 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
         assertCorrectHead(masterHeadHash);
     }
 
-    @Test(expected = RequiredBuilderFailed.class)
-    public void testRemoteNotAccessible() throws IOException {
+    @Test(expected = IllegalArgumentException.class)
+    public void testRemoteNotAccessible() throws Throwable {
         remoteLocation = new File("deadlink");
         build();
     }
 
     @Test
-    public void testCommitBoundCurrentHEADAfterClone() throws IOException {
+    public void testCommitBoundCurrentHEADAfterClone() throws Throwable {
         this.bound = new CommitHashBound(masterHeadHash);
         build();
         assertCorrectHead(masterHeadHash);
     }
 
     @Test
-    public void testCommitBoundCurrentHEADAfterPull() throws IOException {
+    public void testCommitBoundCurrentHEADAfterPull() throws Throwable {
         this.bound = new CommitHashBound(masterHeadHash);
         build();
         build();
@@ -158,14 +158,14 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     }
 
     @Test
-    public void testTagBoundCurrentHEADAfterClone() throws IOException {
+    public void testTagBoundCurrentHEADAfterClone() throws Throwable {
         this.bound = new TagBound(getPathOfRemote(), "v0.1");
         build();
         assertCorrectHead(tagHash);
     }
 
     @Test
-    public void testTagBoundCurrentHEADAfterPull() throws IOException {
+    public void testTagBoundCurrentHEADAfterPull() throws Throwable {
         this.bound = new TagBound(getPathOfRemote(), "v0.1");
         build();
         build();
@@ -173,21 +173,21 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     }
 
     @Test
-    public void testBranchBoundCurrentHEADAfterClone() throws IOException {
+    public void testBranchBoundCurrentHEADAfterClone() throws Throwable {
         this.bound = new BranchBound(getPathOfRemote(), "master2");
         build();
         assertCorrectHead(master2HeadHash);
     }
 
     @Test
-    public void testBranchBoundCurrentHEADAfterPull() throws IOException {
+    public void testBranchBoundCurrentHEADAfterPull() throws Throwable {
         this.bound = new BranchBound(getPathOfRemote(), "master2");
         build();
         build();
         assertCorrectHead(master2HeadHash);
     }
 
-    private void build() throws IOException {
+    private void build() throws Throwable {
         GitInput.Builder inputBuilder =
             new GitInput.Builder(directory, getPathOfRemote());
         inputBuilder.addBranchToClone("master2");
