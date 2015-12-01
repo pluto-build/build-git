@@ -1,20 +1,22 @@
 package build.pluto.buildgit.dependency;
 
-import build.pluto.builder.BuildUnitProvider;
-import build.pluto.buildgit.bound.UpdateBound;
-import build.pluto.buildgit.util.FileUtil;
-import build.pluto.buildgit.util.GitHandler;
-import build.pluto.dependency.RemoteRequirement;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
 import org.sugarj.common.FileCommands;
 
+import build.pluto.builder.BuildUnitProvider;
+import build.pluto.buildgit.bound.UpdateBound;
+import build.pluto.buildgit.util.FileUtil;
+import build.pluto.buildgit.util.GitHandler;
+import build.pluto.dependency.RemoteRequirement;
+
 public class GitRemoteRequirement extends RemoteRequirement implements Serializable {
 
-    private File directory;
+    private static final long serialVersionUID = 33598143840957248L;
+    
+	private File directory;
     private UpdateBound bound;
     private String url;
 
@@ -40,7 +42,7 @@ public class GitRemoteRequirement extends RemoteRequirement implements Serializa
         } catch (IOException e) {
             return true;
         }
-        if (currentHash == null || !bound.reachedBound(currentHash)) {
+        if (currentHash == null || !bound.getBoundHash().equals(currentHash)) {
             return false;
         }
         return true;

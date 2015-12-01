@@ -7,7 +7,9 @@ package build.pluto.buildgit.bound;
  */
 public class CommitHashBound implements UpdateBound {
 
-    private final String commitHash;
+    private static final long serialVersionUID = 2820137937298595751L;
+    
+	private final String commitHash;
 
     public CommitHashBound(String commitHash) {
         this.commitHash = commitHash;

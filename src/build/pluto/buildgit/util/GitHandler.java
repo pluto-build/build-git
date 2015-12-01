@@ -43,7 +43,6 @@ public class GitHandler {
 
     public static void cloneRepository(GitInput input) throws NotClonedException {
         try {
-            List<String> branchesToClone = new ArrayList<>();
             Git git = Git.cloneRepository()
                     .setURI(input.url)
                     .setDirectory(input.directory)
@@ -243,9 +242,10 @@ public class GitHandler {
         Repository repo = null;
         repo = git.getRepository();
         List<File> foundFiles = new ArrayList<>();
+        TreeWalk treeWalk = null;
         try {
+        	treeWalk = new TreeWalk(repo);
             FileTreeIterator tree = new FileTreeIterator(repo);
-            TreeWalk treeWalk = new TreeWalk(repo);
             treeWalk.addTree(tree);
             treeWalk.setRecursive(false);
             while (treeWalk.next()) {
@@ -260,6 +260,9 @@ public class GitHandler {
             }
         } catch (Exception e) {
             return null;
+        } finally {
+        	if (treeWalk != null)
+        		treeWalk.close();
         }
         return foundFiles;
     }

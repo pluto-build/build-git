@@ -9,7 +9,9 @@ import build.pluto.buildgit.util.GitHandler;
  */
 public class BranchBound implements UpdateBound {
 
-    private final String branchName;
+    private static final long serialVersionUID = -1178775937862626673L;
+    
+	private final String branchName;
     private final String remote;
 
     public BranchBound(String remote, String branchName) {

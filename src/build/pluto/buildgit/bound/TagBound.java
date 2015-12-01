@@ -8,7 +8,9 @@ import build.pluto.buildgit.util.GitHandler;
  */
 public class TagBound implements UpdateBound {
 
-    private final String remote;
+    private static final long serialVersionUID = 3359487015008393192L;
+    
+	private final String remote;
     private final String tag;
 
     public TagBound(String remote, String tag) {

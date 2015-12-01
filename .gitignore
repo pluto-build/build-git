@@ -1,1 +1,5 @@
-src/test/resources/dummy/
+target/
+META-INF
+
+testdata/*/*/
+test/resources/dummy/
