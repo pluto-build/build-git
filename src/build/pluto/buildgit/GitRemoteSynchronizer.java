@@ -23,8 +23,7 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
 
     @Override
     protected String description(GitInput input) {
-        return "Keeps the directory " + input.directory.toString()
-               + " in sync with " + input.url;
+        return "Git sync " + input.directory + " with remote " + input.url + " at " + input.bound;
     }
 
     @Override
