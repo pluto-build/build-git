@@ -35,7 +35,7 @@ public class GitHandlerTest {
 
     private GitInput in;
     private String dummyPath;
-    private static final File testRemote = new File("src/test/resources/dummy");
+    private static final File testRemote = new File("testdata/dummy");
     private final String featureHeadHash = "c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f";
     private final String masterHeadHash = "ddfa2acb09533f16792f6006316ce2744792d839";
     private final String tagHash = "3d8913c40c2387488172368a5cf9cf5eb64fed88";
@@ -69,7 +69,7 @@ public class GitHandlerTest {
 
     @Before
     public void init() {
-        File dummyLocation = new File("src/test/resources/dummy");
+        File dummyLocation = testRemote;
         this.dummyPath = "file://" + dummyLocation.getAbsolutePath();
         this.in = this.createInput("testLocal", this.dummyPath);
     }

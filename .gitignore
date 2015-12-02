@@ -1,5 +1,5 @@
 target/
 META-INF
 
-testdata/*/*/
+/testdata
 test/resources/dummy/

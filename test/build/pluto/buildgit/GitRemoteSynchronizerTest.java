@@ -1,30 +1,28 @@
 package build.pluto.buildgit;
 
-import build.pluto.builder.BuildManagers;
-import build.pluto.builder.BuildRequest;
-import build.pluto.builder.RequiredBuilderFailed;
-import build.pluto.buildgit.bound.BranchBound;
-import build.pluto.buildgit.bound.CommitHashBound;
-import build.pluto.buildgit.bound.TagBound;
-import build.pluto.buildgit.bound.UpdateBound;
-import build.pluto.buildgit.util.GitHandler;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-import build.pluto.test.build.ScopedBuildTest;
-import build.pluto.test.build.ScopedPath;
+import java.io.File;
+import java.io.IOException;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sugarj.common.FileCommands;
 
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import build.pluto.builder.BuildManagers;
+import build.pluto.builder.BuildRequest;
+import build.pluto.buildgit.bound.BranchBound;
+import build.pluto.buildgit.bound.CommitHashBound;
+import build.pluto.buildgit.bound.TagBound;
+import build.pluto.buildgit.bound.UpdateBound;
+import build.pluto.buildgit.util.GitHandler;
+import build.pluto.test.build.ScopedBuildTest;
+import build.pluto.test.build.ScopedPath;
 
 public class GitRemoteSynchronizerTest extends ScopedBuildTest {
 
@@ -34,7 +32,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     private UpdateBound bound;
     private long consistencyCheckInterval;
 
-    private static final File testRemote = new File("src/test/resources/dummy");
+    private static final File testRemote = new File("testdata/dummy");
     private final String featureHeadHash = "c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f";
     private final String masterHeadHash = "ddfa2acb09533f16792f6006316ce2744792d839";
     private final String master2HeadHash = "99417aa270f38d6a7d5aef584570653f58eef14b";
@@ -69,7 +67,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
 
     @Before
     public void init() {
-        this.remoteLocation = new File("src/test/resources/dummy");
+        this.remoteLocation = testRemote;
         this.bound = new BranchBound(getPathOfRemote(), "master");
         this.consistencyCheckInterval = 0;
     }
