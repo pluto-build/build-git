@@ -75,6 +75,7 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
             if (GitHandler.isRepo(input.directory)) {
                 boolean isUrlSet = GitHandler.isUrlSet(input.directory, input.url);
                 if(!isUrlSet) {
+                	// TODO add remote instead of throwing exception
                     throw new IllegalArgumentException(input.directory + " has " + input.url + " not set as remote");
                 } else {
                     return;
