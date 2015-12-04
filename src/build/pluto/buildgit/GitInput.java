@@ -2,6 +2,7 @@ package build.pluto.buildgit;
 
 import build.pluto.buildgit.bound.BranchBound;
 import build.pluto.buildgit.bound.UpdateBound;
+import build.pluto.dependency.RemoteRequirement;
 
 import java.io.File;
 import java.io.Serializable;
@@ -94,7 +95,7 @@ public class GitInput implements Serializable {
         /**
          * @param mergeStrategy is the strategy in which merges get performed.
          * You can choose between OURS, RECURSIVE,RESOLVE, SIMPLE_TWO_WAY_IN_CORE
-         * and THREIS. The default is RESOLVE.
+         * and THEIRS. The default is RESOLVE.
          */
         public Builder setMergeStrategy(MergeStrategy mergeStrategy) {
             this.mergeStrategy = mergeStrategy;
@@ -123,15 +124,25 @@ public class GitInput implements Serializable {
          * @param bound is the bound of repository that it has to follow.
          * The default is the master branch.
          */
+        public Builder setBranch(String branch) {
+            this.bound = new BranchBound(url, branch);
+            return this;
+        }
+        
+        /**
+         * @param bound is the bound of repository that it has to follow.
+         * The default is the master branch.
+         */
         public Builder setBound(UpdateBound bound) {
             this.bound = bound;
             return this;
         }
 
         /**
-         * @param consistencyCheckInterval how long the builder waits til the
+         * @param consistencyCheckInterval how long the builder waits until the
          * consistency of the builder gets checked again in milliseconds.
          * The default is 0;
+         * @see RemoteRequirement
          */
         public Builder setConsistencyCheckInterval(long consistencyCheckInterval) {
             this.consistencyCheckInterval = consistencyCheckInterval;
