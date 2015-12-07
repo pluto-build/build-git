@@ -70,7 +70,10 @@ public class GitInput implements Serializable {
          * @param branchName the name of the branch you want to get cloned.
          */
         public Builder addBranchToClone(String branchName) {
-            this.branchesToClone.add(branchName);
+            if(!branchName.equals("master")
+                    && !this.branchesToClone.contains(branchName))
+                this.branchesToClone.add(branchName);
+
             return this;
         }
 
@@ -125,6 +128,7 @@ public class GitInput implements Serializable {
          * The default is the master branch.
          */
         public Builder setBranch(String branch) {
+            this.addBranchToClone(branch);
             this.bound = new BranchBound(url, branch);
             return this;
         }

@@ -102,6 +102,24 @@ public class GitHandlerTest {
     }
 
     @Test
+    public void checkCloneOtherBranchThanMaster() {
+        File repoLocation = new File("testLoca");
+        in = new GitInput.Builder(repoLocation, this.dummyPath)
+                .setBranch("feature")
+                .build();
+        try {
+            GitHandler.cloneRepository(in);
+        } catch (GitException e) {
+            fail("Could not clone repository");
+        }
+        try {
+            GitHandler.checkout(repoLocation, "feature");
+        } catch (GitException e) {
+            fail("Could not checkout other branch than master");
+        }
+    }
+
+    @Test
     public void checkIsUrlSet() throws GitException {
         clone(in);
         assertTrue(GitHandler.isUrlSet(in.directory, in.url));
