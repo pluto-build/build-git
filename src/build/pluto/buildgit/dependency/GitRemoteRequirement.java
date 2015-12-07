@@ -7,6 +7,7 @@ import java.io.Serializable;
 import org.sugarj.common.FileCommands;
 
 import build.pluto.builder.BuildUnitProvider;
+import build.pluto.buildgit.GitException;
 import build.pluto.buildgit.bound.UpdateBound;
 import build.pluto.buildgit.util.FileUtil;
 import build.pluto.buildgit.util.GitHandler;
@@ -39,7 +40,7 @@ public class GitRemoteRequirement extends RemoteRequirement implements Serializa
         String currentHash = null;
         try {
             currentHash = GitHandler.getHashOfHEAD(directory);
-        } catch (IOException e) {
+        } catch (IOException | GitException e) {
             return true;
         }
         if (currentHash == null || !bound.getBoundHash().equals(currentHash)) {
@@ -56,8 +57,10 @@ public class GitRemoteRequirement extends RemoteRequirement implements Serializa
     @Override
     protected boolean isLocalResourceAvailable() {
         if (!FileUtil.isDirectoryEmpty(directory)) {
-            boolean isUrlSet = GitHandler.isUrlSet(directory, url);
-            return isUrlSet;
+            try {
+				return GitHandler.isUrlSet(directory, url);
+			} catch (GitException e) {
+			}
         }
         return false;
     }

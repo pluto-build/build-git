@@ -70,7 +70,7 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
         return None.val;
     }
 
-    private void isInputValid(GitInput input) {
+    private void isInputValid(GitInput input) throws GitException {
         if (!FileUtil.isDirectoryEmpty(input.directory)) {
             if (!GitHandler.isRepo(input.directory))
             	throw new IllegalArgumentException(input.directory + " contains other data");

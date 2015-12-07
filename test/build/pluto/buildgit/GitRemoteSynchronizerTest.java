@@ -8,7 +8,6 @@ import java.io.IOException;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -93,7 +92,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     }
 
     @Test
-    public void testNeedToPull() throws Throwable, InvalidRefNameException {
+    public void testNeedToPull() throws Throwable {
         build();
         createCommitOnRemote();
         String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD(getPathOfRemote(), "master");
@@ -103,7 +102,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
     }
 
     @Test
-    public void testDontCheckConsistencyToEarly() throws Throwable, InvalidRefNameException {
+    public void testDontCheckConsistencyToEarly() throws Throwable {
         this.consistencyCheckInterval = (long) 10e6;
         build();
         createCommitOnRemote();
@@ -224,7 +223,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
         }
     }
 
-    private void deleteTempCommitOnRemote() throws InvalidRefNameException {
+    private void deleteTempCommitOnRemote() throws GitException {
         GitHandler.resetRepoToCommit(remoteLocation, masterHeadHash);
     }
 }

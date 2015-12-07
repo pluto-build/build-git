@@ -103,13 +103,13 @@ public class GitHandlerTest {
     }
 
     @Test
-    public void checkIsUrlSet() {
+    public void checkIsUrlSet() throws GitException {
         clone(in);
         assertTrue(GitHandler.isUrlSet(in.directory, in.url));
     }
 
     @Test
-    public void checkIsUrlNotSet() {
+    public void checkIsUrlNotSet() throws GitException {
         try {
             clone(in);
             Repository repo = Git.open(in.directory).getRepository();
@@ -150,8 +150,6 @@ public class GitHandlerTest {
             GitHandler.commit(in.directory, "local changes");
         } catch (IOException e) {
             fail("Could not open the repository");
-        } catch (GitAPIException e) {
-            fail("Could not commit local change");
         }
         GitHandler.pull(in);
     }
@@ -202,14 +200,14 @@ public class GitHandlerTest {
     }
 
     @Test
-    public void checkGetNotIgnoredFilesOfRepoCorrectSize() {
+    public void checkGetNotIgnoredFilesOfRepoCorrectSize() throws GitException {
         clone(in);
         List<File> foundFiles = GitHandler.getNotIgnoredFilesOfRepo(in.directory);
         assertEquals(foundFiles.size(), 2);
     }
 
     @Test
-    public void checkListsUntrackedFiles() {
+    public void checkListsUntrackedFiles() throws GitException {
         clone(in);
         try{
             File dummyFile = new File(in.directory, "dummyFile.txt");
@@ -222,7 +220,7 @@ public class GitHandlerTest {
     }
 
     @Test
-    public void checkListOnlyNotIgnoredFiles() {
+    public void checkListOnlyNotIgnoredFiles() throws GitException {
         clone(in);
         try{
             File tempDir = new File(in.directory, "temp");

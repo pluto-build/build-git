@@ -12,7 +12,6 @@ import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -30,11 +29,11 @@ import build.pluto.buildgit.bound.UpdateBound;
 
 public class GitHandler {
 
-    private static Git openRepository(File directory) {
+    private static Git openRepository(File directory) throws GitException {
         try {
             return Git.open(directory);
         } catch (IOException e) {
-            return null;
+            throw new GitException("Cannot open repository " + directory, e);
         }
     }
 
@@ -58,8 +57,8 @@ public class GitHandler {
     }
 
     public static void checkout(File directory, String hash) throws GitException {
+    	Git git = openRepository(directory);
         try {
-            Git git = openRepository(directory);
             git.checkout()
                .setName(hash)
                .call();
@@ -89,7 +88,7 @@ public class GitHandler {
         }
     }
 
-    private static String getRemoteOfUrl(File directory, String url) {
+    private static String getRemoteOfUrl(File directory, String url) throws GitException {
         Git git = openRepository(directory);
         StoredConfig config = git.getRepository().getConfig();
         Set<String> remotes = config.getSubsections("remote");
@@ -117,23 +116,25 @@ public class GitHandler {
         }
     }
 
-    public static void add(File directory, String filePattern) {
+    public static void add(File directory, String filePattern) throws GitException {
         try {
             Git git = openRepository(directory);
             git.add().addFilepattern(filePattern).call();
         } catch (GitAPIException e ) {
+        	throw new GitException("Git add of " + filePattern + " in " + directory + " failed", e);
         }
     }
 
-    public static void commit(File directory, String message) {
+    public static void commit(File directory, String message) throws GitException {
         try {
             Git git = openRepository(directory);
             git.commit().setMessage(message).call();
         } catch (GitAPIException e ) {
+        	throw new GitException("Commit " + message + " in " + directory + " failed", e);
         }
     }
 
-    public static boolean isUrlSet(File directory, String url) {
+    public static boolean isUrlSet(File directory, String url) throws GitException {
         Git git = openRepository(directory);
         if(git == null) {
             return false;
@@ -168,8 +169,7 @@ public class GitHandler {
         return true;
     }
 
-    public static void resetRepoToCommit(File directory, String commitHash)
-            throws InvalidRefNameException {
+    public static void resetRepoToCommit(File directory, String commitHash) throws GitException {
         try {
             Git git = openRepository(directory);
             git.reset()
@@ -177,12 +177,11 @@ public class GitHandler {
                .setRef(commitHash)
                .call();
         } catch (GitAPIException e) {
-            throw new InvalidRefNameException("Ref  "
-                    + commitHash + " does not exist");
+            throw new GitException("Ref " + commitHash + " does not exist", e);
         }
     }
 
-    public static String getHashOfHEAD(File directory) throws IOException {
+    public static String getHashOfHEAD(File directory) throws IOException, GitException {
         Git git = openRepository(directory);
         Ref headRef = git.getRepository().getRef("HEAD");
         ObjectId objectId = headRef.getObjectId();
@@ -221,7 +220,7 @@ public class GitHandler {
         return null;
     }
 
-    public static List<File> getNotIgnoredFilesOfRepo(File directory) {
+    public static List<File> getNotIgnoredFilesOfRepo(File directory) throws GitException {
         Git git = openRepository(directory);
         Repository repo = null;
         repo = git.getRepository();
@@ -242,9 +241,9 @@ public class GitHandler {
                         foundFiles.add(file);
                     }
             }
-        } catch (Exception e) {
-            return null;
-        } finally {
+		} catch (IOException e) {
+			throw new GitException("Listing of non-ignored files in " + directory + " failed", e);
+		} finally {
         	if (treeWalk != null)
         		treeWalk.close();
         }
