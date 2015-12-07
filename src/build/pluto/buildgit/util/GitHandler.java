@@ -50,7 +50,7 @@ public class GitHandler {
                    .setName(branchName)
                    .setStartPoint("origin/" + branchName).call();
             }
-            git.checkout().setName("master").call();
+            git.checkout().setName(input.bound.getBound()).call();
         } catch (GitAPIException e) {
             throw new GitException("Clone of repository " + input.url + " failed", e);
         }
