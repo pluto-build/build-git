@@ -34,19 +34,14 @@ public class GitRemoteRequirement extends RemoteRequirement implements Serializa
 
 
     public boolean isConsistentWithRemote() {
-        if (!FileCommands.exists(directory)) {
+        if (!FileCommands.exists(directory))
             return false;
-        }
-        String currentHash = null;
         try {
-            currentHash = GitHandler.getHashOfHEAD(directory);
+        	String currentHash = GitHandler.getHashOfHEAD(directory);
+            return currentHash != null && bound.getBoundHash().equals(currentHash);
         } catch (IOException | GitException e) {
-            return true;
-        }
-        if (currentHash == null || !bound.getBoundHash().equals(currentHash)) {
             return false;
         }
-        return true;
     }
 
     @Override
@@ -56,13 +51,11 @@ public class GitRemoteRequirement extends RemoteRequirement implements Serializa
 
     @Override
     protected boolean isLocalResourceAvailable() {
-        if (!FileUtil.isDirectoryEmpty(directory)) {
-            try {
-				return GitHandler.isUrlSet(directory, url);
-			} catch (GitException e) {
-			}
-        }
-        return false;
+        try {
+			return !FileUtil.isDirectoryEmpty(directory) && GitHandler.isUrlSet(directory, url);
+		} catch (GitException e) {
+			return false;
+		}
     }
 
     @Override
