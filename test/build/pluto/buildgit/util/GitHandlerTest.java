@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
@@ -123,21 +122,14 @@ public class GitHandlerTest {
     }
 
     @Test
-    public void checkPull() throws InvalidRefNameException {
-        try {
-            clone(in);
-            String content = FileCommands.readFileAsString(new File(in.directory, "README.md"));
-            assertEquals(content, "This is a dummy repository for testing.\n");
-            GitHandler.resetRepoToCommit(in.directory, "HEAD^");
-            GitHandler.pull(in);
-            content = FileCommands.readFileAsString(new File(in.directory, "README.md"));
-            assertEquals(content, "This is a dummy repository for testing.\n");
-        } catch (IOException e) {
-            fail("Could not read file");
-        } catch (GitException e) {
-            e.printStackTrace();
-            fail("Could not pull repository");
-        }
+    public void checkPull() throws InvalidRefNameException, GitException, IOException {
+        clone(in);
+        String content = FileCommands.readFileAsString(new File(in.directory, "README.md"));
+        assertEquals(content, "This is a dummy repository for testing.\n");
+        GitHandler.resetRepoToCommit(in.directory, "HEAD^");
+        GitHandler.pull(in);
+        content = FileCommands.readFileAsString(new File(in.directory, "README.md"));
+        assertEquals(content, "This is a dummy repository for testing.\n");
     }
 
     @Test(expected = GitException.class)
