@@ -22,7 +22,7 @@ public class GitInput implements Serializable {
     public final boolean createMergeCommit;
     public final boolean squashCommit;
     public final UpdateBound bound;
-    public transient long consistencyCheckInterval;
+    public final long consistencyCheckInterval;
 
 
     private GitInput(Builder builder) {

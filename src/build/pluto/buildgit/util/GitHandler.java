@@ -1,20 +1,18 @@
 package build.pluto.buildgit.util;
 
-import build.pluto.buildgit.GitInput;
-import build.pluto.buildgit.bound.BranchBound;
-import build.pluto.buildgit.bound.CommitHashBound;
-import build.pluto.buildgit.bound.UpdateBound;
-import build.pluto.buildgit.exception.NotCheckedOutException;
-import build.pluto.buildgit.exception.NotClonedException;
-import build.pluto.buildgit.exception.NotFetchedException;
-import build.pluto.buildgit.exception.NotPulledException;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
-import org.eclipse.jgit.api.errors.NotMergedException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -24,12 +22,11 @@ import org.eclipse.jgit.treewalk.FileTreeIterator;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.WorkingTreeIterator;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import build.pluto.buildgit.GitException;
+import build.pluto.buildgit.GitInput;
+import build.pluto.buildgit.bound.BranchBound;
+import build.pluto.buildgit.bound.CommitHashBound;
+import build.pluto.buildgit.bound.UpdateBound;
 
 public class GitHandler {
 
@@ -41,7 +38,7 @@ public class GitHandler {
         }
     }
 
-    public static void cloneRepository(GitInput input) throws NotClonedException {
+    public static void cloneRepository(GitInput input) throws GitException {
         try {
             Git git = Git.cloneRepository()
                     .setURI(input.url)
@@ -56,43 +53,31 @@ public class GitHandler {
             }
             git.checkout().setName("master").call();
         } catch (GitAPIException e) {
-            e.printStackTrace();
-            throw new NotClonedException();
+            throw new GitException("Clone of repository " + input.url + " failed", e);
         }
     }
 
-    public static void checkout(File directory, String hash)
-            throws NotCheckedOutException {
+    public static void checkout(File directory, String hash) throws GitException {
         try {
             Git git = openRepository(directory);
             git.checkout()
                .setName(hash)
                .call();
         } catch (GitAPIException e) {
-            throw new NotCheckedOutException();
+            throw new GitException("Checkout in directory " + directory + " failed", e);
         }
     }
 
-    public static void pull(GitInput input) throws NotPulledException {
-        FetchResult fetchResult = null;
-        try {
-            fetchResult = fetch(input.directory, input.url);
-        } catch (NotFetchedException e) {
-            throw new NotPulledException();
-        }
-        try {
-            MergeResult mergeResult
-                = merge(input, fetchResult.getAdvertisedRef("HEAD"));
-            if (!mergeResult.getMergeStatus().isSuccessful()) {
-                throw new NotPulledException();
-            }
-        } catch (NotMergedException e) {
-            throw new NotPulledException();
+    public static void pull(GitInput input) throws GitException {
+        FetchResult fetchResult = fetch(input.directory, input.url);
+    	Ref ref = fetchResult.getAdvertisedRef("HEAD");
+        MergeResult mergeResult = merge(input, ref);
+        if (!mergeResult.getMergeStatus().isSuccessful()) {
+        	throw new GitException("Merge of " + ref + " in " + input.directory + " failed");
         }
     }
 
-    private static FetchResult fetch(File directory, String url)
-            throws NotFetchedException {
+    private static FetchResult fetch(File directory, String url) throws GitException {
         try {
             String remoteOfUrl = getRemoteOfUrl(directory, url);
             Git git = openRepository(directory);
@@ -100,7 +85,7 @@ public class GitHandler {
                       .setRemote(remoteOfUrl)
                       .call();
         } catch (GitAPIException e) {
-            throw new NotFetchedException();
+            throw new GitException("Fetch of repository " + url + " failed", e);
         }
     }
 
@@ -117,8 +102,7 @@ public class GitHandler {
         return null;
     }
 
-    private static MergeResult merge(GitInput input, Ref ref)
-            throws NotMergedException {
+    private static MergeResult merge(GitInput input, Ref ref) throws GitException {
         try {
             Git git = openRepository(input.directory);
             MergeCommand merge = git.merge();
@@ -129,7 +113,7 @@ public class GitHandler {
             merge.setStrategy(input.mergeStrategy.getStrategy());
             return merge.call();
         } catch (GitAPIException e) {
-            throw new NotMergedException();
+            throw new GitException("Merge of " + ref + " in " + input.directory + " failed" , e);
         }
     }
 

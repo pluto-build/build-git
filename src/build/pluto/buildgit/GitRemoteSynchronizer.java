@@ -72,16 +72,15 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
 
     private void isInputValid(GitInput input) {
         if (!FileUtil.isDirectoryEmpty(input.directory)) {
-            if (GitHandler.isRepo(input.directory)) {
-                boolean isUrlSet = GitHandler.isUrlSet(input.directory, input.url);
-                if(!isUrlSet) {
-                	// TODO add remote instead of throwing exception
-                    throw new IllegalArgumentException(input.directory + " has " + input.url + " not set as remote");
-                } else {
-                    return;
-                }
+            if (!GitHandler.isRepo(input.directory))
+            	throw new IllegalArgumentException(input.directory + " contains other data");
+            
+            boolean isUrlSet = GitHandler.isUrlSet(input.directory, input.url);
+            if(!isUrlSet) {
+            	// TODO add remote instead of throwing exception
+                throw new IllegalArgumentException(input.directory + " has " + input.url + " not set as remote");
             } else {
-                throw new IllegalArgumentException(input.directory + " contains other data");
+                return;
             }
         }
         if (!GitHandler.isUrlAccessible(input.url)) {

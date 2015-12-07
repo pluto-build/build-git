@@ -1,35 +1,32 @@
 package build.pluto.buildgit.util;
 
-import build.pluto.buildgit.GitInput;
-import build.pluto.buildgit.bound.BranchBound;
-import build.pluto.buildgit.bound.CommitHashBound;
-import build.pluto.buildgit.bound.TagBound;
-import build.pluto.buildgit.bound.UpdateBound;
-import build.pluto.buildgit.exception.NotCheckedOutException;
-import build.pluto.buildgit.exception.NotClonedException;
-import build.pluto.buildgit.exception.NotPulledException;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRefNameException;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.StoredConfig;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.sugarj.common.FileCommands;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRefNameException;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.sugarj.common.FileCommands;
+
+import build.pluto.buildgit.GitException;
+import build.pluto.buildgit.GitInput;
+import build.pluto.buildgit.bound.BranchBound;
+import build.pluto.buildgit.bound.CommitHashBound;
+import build.pluto.buildgit.bound.TagBound;
+import build.pluto.buildgit.bound.UpdateBound;
 
 public class GitHandlerTest {
 
@@ -137,14 +134,14 @@ public class GitHandlerTest {
             assertEquals(content, "This is a dummy repository for testing.\n");
         } catch (IOException e) {
             fail("Could not read file");
-        } catch (NotPulledException e) {
+        } catch (GitException e) {
             e.printStackTrace();
             fail("Could not pull repository");
         }
     }
 
-    @Test(expected = NotPulledException.class)
-    public void checkPullWithLocalCommit() throws NotPulledException {
+    @Test(expected = GitException.class)
+    public void checkPullWithLocalCommit() throws GitException {
         clone(in);
         try {
             GitHandler.resetRepoToCommit(in.directory, "HEAD^");
@@ -160,19 +157,13 @@ public class GitHandlerTest {
     }
 
     @Test
-    public void testCheckout() {
+    public void testCheckout() throws GitException {
         clone(in);
-        Exception ex = null;
-        try {
-            GitHandler.checkout(in.directory, "feature");
-        } catch (NotCheckedOutException e ) {
-            ex = e;
-        }
-        assertNull(ex);
+        GitHandler.checkout(in.directory, "feature");
     }
 
-    @Test(expected = NotCheckedOutException.class)
-    public void testCheckoutFailed() throws NotCheckedOutException {
+    @Test(expected = GitException.class)
+    public void testCheckoutFailed() throws GitException {
         clone(in);
         GitHandler.checkout(in.directory, "master2");
     }
@@ -248,7 +239,7 @@ public class GitHandlerTest {
     private void clone(GitInput input) {
         try {
             GitHandler.cloneRepository(input);
-        } catch (NotClonedException e) {
+        } catch (GitException e) {
             fail("Could not clone repository");
         }
     }
