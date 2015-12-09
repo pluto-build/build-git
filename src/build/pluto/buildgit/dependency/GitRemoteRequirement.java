@@ -6,7 +6,6 @@ import java.io.Serializable;
 
 import org.sugarj.common.FileCommands;
 
-import build.pluto.builder.BuildUnitProvider;
 import build.pluto.buildgit.GitException;
 import build.pluto.buildgit.bound.UpdateBound;
 import build.pluto.buildgit.util.FileUtil;
@@ -57,12 +56,6 @@ public class GitRemoteRequirement extends RemoteRequirement implements Serializa
 			return false;
 		}
     }
-
-    @Override
-    public boolean tryMakeConsistent(BuildUnitProvider manager) throws IOException {
-        return this.isConsistent();
-    }
-
 
     @Override
     public String toString() {
