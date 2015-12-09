@@ -23,7 +23,7 @@ public class GitInput implements Serializable {
     public final boolean squashCommit;
     public final UpdateBound bound;
     public final long consistencyCheckInterval;
-
+    public final boolean allowLocalChanges;
 
     private GitInput(Builder builder) {
         this.directory = builder.directory;
@@ -36,6 +36,7 @@ public class GitInput implements Serializable {
         this.squashCommit = builder.squashCommit;
         this.bound = builder.bound;
         this.consistencyCheckInterval = builder.consistencyCheckInterval;
+        this.allowLocalChanges = builder.allowLocalChanges;
     }
 
     public static class Builder {
@@ -49,7 +50,8 @@ public class GitInput implements Serializable {
         private boolean createMergeCommit = false;
         private boolean squashCommit = false;
         private UpdateBound bound = null;
-        private transient long consistencyCheckInterval = -1L;
+        private long consistencyCheckInterval = -1L;
+        private boolean allowLocalChanges = false;
 
         /**
          * @param directory in which the repository gets cloned into.
@@ -152,6 +154,11 @@ public class GitInput implements Serializable {
             this.consistencyCheckInterval = consistencyCheckInterval;
             return this;
         }
+        
+        public Builder setAllowLocalChanges(boolean allowLocalChanges) {
+			this.allowLocalChanges = allowLocalChanges;
+			return this;
+		}
 
         public GitInput build() {
             return new GitInput(this);

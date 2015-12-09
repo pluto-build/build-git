@@ -1,16 +1,20 @@
 package build.pluto.buildgit;
 
+import java.io.File;
+import java.util.List;
+
+import org.sugarj.common.FileCommands;
+
+import build.pluto.builder.Builder;
 import build.pluto.builder.BuilderFactory;
 import build.pluto.builder.BuilderFactoryFactory;
-import build.pluto.builder.Builder;
 import build.pluto.buildgit.dependency.GitRemoteRequirement;
 import build.pluto.buildgit.util.FileUtil;
 import build.pluto.buildgit.util.GitHandler;
 import build.pluto.output.None;
-import org.sugarj.common.FileCommands;
-
-import java.io.File;
-import java.util.List;
+import build.pluto.stamp.FileHashStamper;
+import build.pluto.stamp.FileIgnoreStamper;
+import build.pluto.stamp.Stamper;
 
 public class GitRemoteSynchronizer extends Builder<GitInput, None> {
 
@@ -63,10 +67,10 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
         this.requireOther(gitRequirement);
 
         //provide files
+        Stamper stamper = input.allowLocalChanges ? FileIgnoreStamper.instance : FileHashStamper.instance;
         List<File> outputFiles = GitHandler.getNotIgnoredFilesOfRepo(input.directory);
-        for(File f : outputFiles) {
-            this.provide(f);
-        }
+        for(File f : outputFiles)
+            this.provide(f, stamper);
         return None.val;
     }
 
