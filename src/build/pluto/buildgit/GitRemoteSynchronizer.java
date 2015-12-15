@@ -3,8 +3,6 @@ package build.pluto.buildgit;
 import java.io.File;
 import java.util.List;
 
-import org.sugarj.common.FileCommands;
-
 import build.pluto.builder.Builder;
 import build.pluto.builder.BuilderFactory;
 import build.pluto.builder.BuilderFactoryFactory;
@@ -18,77 +16,55 @@ import build.pluto.stamp.Stamper;
 
 public class GitRemoteSynchronizer extends Builder<GitInput, None> {
 
-    public static BuilderFactory<GitInput, None, GitRemoteSynchronizer> factory
-        = BuilderFactoryFactory.of(GitRemoteSynchronizer.class, GitInput.class);
+  public static BuilderFactory<GitInput, None, GitRemoteSynchronizer> factory = BuilderFactoryFactory.of(GitRemoteSynchronizer.class, GitInput.class);
 
-    public GitRemoteSynchronizer(GitInput input) {
-        super(input);
-    }
+  public GitRemoteSynchronizer(GitInput input) {
+    super(input);
+  }
 
-    @Override
-    protected String description(GitInput input) {
-        return "Git sync " + input.directory + " with remote " + input.url + " at " + input.bound.getBound();
-    }
+  @Override
+  protected String description(GitInput input) {
+    return "Git sync " + input.directory + " with remote " + input.url + " at " + input.bound.getBound();
+  }
 
-    @Override
-    public File persistentPath(GitInput input) {
-        return new File(input.directory, ".git/git.dep");
-    }
+  @Override
+  public File persistentPath(GitInput input) {
+    return new File(input.directory, ".git/git.dep");
+  }
 
-    @Override
-    protected None build(GitInput input) throws Throwable {
-        isInputValid(input);
-        if (!FileCommands.exists(input.directory)
-                || FileUtil.isDirectoryEmpty(input.directory)) {
-            GitHandler.cloneRepository(input);
-            if(input.bound != null) {
-                GitHandler.resetRepoToCommit(input.directory,
-                                             input.bound.getBoundHash());
-            }
-        } else {
-            GitHandler.checkout(input.directory, input.bound.getBound());
-            // do not pull if no connection can be made so the builder does
-            // not fail
-            if(GitHandler.isUrlAccessible(input.url)) {
-                GitHandler.pull(input);
-            }
-        }
+  @Override
+  protected None build(GitInput input) throws Throwable {
+    boolean isRepo = GitHandler.isRepo((input.directory));
+    boolean isDirEmpty = FileUtil.isDirectoryEmpty(input.directory);
+    if (!isDirEmpty && !isRepo)
+      throw new IllegalArgumentException(input.directory + " contains other data");
 
-        //need to create requirement after the repo gets cloned because
-        //the directory contains git.time.dep inside of .git when the
-        //constructor gets called
+    if (!isDirEmpty && isRepo) {
+      GitHandler.checkout(input.directory, input.bound.getBound());
+      if (GitHandler.isUrlAccessible(input.url))
+        GitHandler.pull(input);
+    } else {
+      try {
+        GitHandler.cloneRepository(input);
+        GitHandler.resetRepoToCommit(input.directory, input.bound.getBoundHash());
+      } finally {
         File tsPersistentPath = new File(input.directory, ".git/git.dep.time");
         GitRemoteRequirement gitRequirement = new GitRemoteRequirement(
-                input.directory,
-                input.bound,
-                input.url,
-                input.consistencyCheckInterval,
-                tsPersistentPath);
-        this.requireOther(gitRequirement);
-
-        //provide files
-        Stamper stamper = input.allowLocalChanges ? FileIgnoreStamper.instance : FileHashStamper.instance;
-        List<File> outputFiles = GitHandler.getNotIgnoredFilesOfRepo(input.directory);
-        for(File f : outputFiles)
-            this.provide(f, stamper);
-        return None.val;
+            input.directory,
+            input.bound,
+            input.url,
+            input.consistencyCheckInterval,
+            tsPersistentPath);
+        requireOther(gitRequirement);
+      }
     }
 
-    private void isInputValid(GitInput input) throws GitException {
-        if (!FileUtil.isDirectoryEmpty(input.directory)) {
-            if (!GitHandler.isRepo(input.directory))
-            	throw new IllegalArgumentException(input.directory + " contains other data");
-            
-            boolean isUrlSet = GitHandler.isUrlSet(input.directory, input.url);
-            if(!isUrlSet) {
-            	// TODO add remote instead of throwing exception
-                throw new IllegalArgumentException(input.directory + " has " + input.url + " not set as remote");
-            } else {
-                return;
-            }
-        }
-        if (!GitHandler.isUrlAccessible(input.url)) {
-            throw new IllegalArgumentException(input.url + " can not be accessed");
-        }
-    }
+    // provide files
+    Stamper stamper = input.allowLocalChanges ? FileIgnoreStamper.instance : FileHashStamper.instance;
+    List<File> outputFiles = GitHandler.getNotIgnoredFilesOfRepo(input.directory);
+    for (File f : outputFiles)
+      this.provide(f, stamper);
+
+    return None.val;
+  }
 }

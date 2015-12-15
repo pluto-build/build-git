@@ -120,6 +120,24 @@ public class GitHandlerTest {
     }
 
     @Test
+    public void checkIsRepo() {
+        clone(in);
+        assertTrue(GitHandler.isRepo(in.directory));
+    }
+
+    @Test
+    public void checkIsNotRepo() {
+      File testDir = new File("testDir");
+      try {
+        FileCommands.createDir(testDir);
+        FileCommands.createFile(new File(testDir, "testfile"));
+      } catch (IOException e ) {
+        fail("Could not create temporary File");
+      }
+      assertFalse(GitHandler.isRepo(in.directory));
+    }
+
+    @Test
     public void checkIsUrlSet() throws GitException {
         clone(in);
         assertTrue(GitHandler.isUrlSet(in.directory, in.url));

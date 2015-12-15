@@ -15,11 +15,13 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.treewalk.FileTreeIterator;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.WorkingTreeIterator;
+import org.eclipse.jgit.util.FS;
 
 import build.pluto.buildgit.GitException;
 import build.pluto.buildgit.GitInput;
@@ -63,7 +65,7 @@ public class GitHandler {
                .setName(hash)
                .call();
         } catch (GitAPIException e) {
-            throw new GitException("Checkout in directory " + directory + " failed", e);
+          throw new GitException("Checkout in directory " + directory + " failed", e);
         }
     }
 
@@ -160,13 +162,9 @@ public class GitHandler {
         return true;
     }
 
-    public static boolean isRepo(File location) {
-        try {
-            Git.open(location);
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
+    public static boolean isRepo(File directory) {
+      File gitDir = new File(directory, ".git");
+      return gitDir.exists() && RepositoryCache.FileKey.isGitRepository(gitDir, FS.DETECTED);
     }
 
     public static void resetRepoToCommit(File directory, String commitHash) throws GitException {

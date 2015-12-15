@@ -133,7 +133,7 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
         assertCorrectHead(masterHeadHash);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = GitException.class)
     public void testRemoteNotAccessible() throws Throwable {
         remoteLocation = new File("deadlink");
         build();
@@ -182,6 +182,19 @@ public class GitRemoteSynchronizerTest extends ScopedBuildTest {
         build();
         build();
         assertCorrectHead(master2HeadHash);
+    }
+
+    @Test
+    public void testBuildAfterFailing() throws Throwable {
+        try {
+            build();
+            fail("The execution should fail because the repo does not exist");
+        } catch (Throwable e) {
+            // don't want the method to throw the exception
+        }
+        cloneRepo();
+        build();
+        assertCorrectHead(masterHeadHash);
     }
 
     private void build() throws Throwable {
