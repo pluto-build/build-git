@@ -49,8 +49,7 @@ public class GitRemoteSynchronizer extends Builder<GitInput, None> {
         GitHandler.resetRepoToCommit(input.directory, input.bound.getBoundHash());
       } finally {
         File tsPersistentPath = new File(input.directory, ".git/git.dep.time");
-        GitRemoteRequirement gitRequirement = new GitRemoteRequirement(
-            input.directory,
+        GitRemoteRequirement gitRequirement = new GitRemoteRequirement(input.directory,
             input.bound,
             input.url,
             input.consistencyCheckInterval,

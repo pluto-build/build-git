@@ -25,218 +25,217 @@ import build.pluto.test.build.ScopedPath;
 
 public class GitRemoteSynchronizerTest extends ScopedBuildTest {
 
-    @ScopedPath("")
-    private File directory;
-    private File remoteLocation;
-    private UpdateBound bound;
-    private long consistencyCheckInterval;
+  @ScopedPath("")
+  private File directory;
+  private File remoteLocation;
+  private UpdateBound bound;
+  private long consistencyCheckInterval;
 
-    private static final File testRemote = new File("testdata/dummy");
-    private final String featureHeadHash = "c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f";
-    private final String masterHeadHash = "ddfa2acb09533f16792f6006316ce2744792d839";
-    private final String master2HeadHash = "99417aa270f38d6a7d5aef584570653f58eef14b";
-    private final String tagHash = "3d8913c40c2387488172368a5cf9cf5eb64fed88";
+  private static final File testRemote = new File("testdata/dummy");
+  private final String featureHeadHash = "c55e35f7b4d3ff14cb8a99268e6ae0439e6c0d6f";
+  private final String masterHeadHash = "ddfa2acb09533f16792f6006316ce2744792d839";
+  private final String master2HeadHash = "99417aa270f38d6a7d5aef584570653f58eef14b";
+  private final String tagHash = "3d8913c40c2387488172368a5cf9cf5eb64fed88";
 
-    @BeforeClass
-    public static void cloneRepo() {
-        if(testRemote.exists()) {
-            return;
-        }
-        GitInput input = new GitInput.Builder(
-                testRemote,
-                "https://github.com/andiderp/dummy")
-            .addBranchToClone("feature")
-            .addBranchToClone("master2")
-            .build();
-        try {
-            GitHandler.cloneRepository(input);
-        } catch (Exception e) {
-            fail("Could not setup class");
-        }
+  @BeforeClass
+  public static void cloneRepo() {
+    if (testRemote.exists()) {
+      return;
     }
-
-    // @AfterClass
-    // public static void delteRepo() {
-    //     try {
-    //         FileCommands.delete(testRemote);
-    //     } catch (IOException e) {
-    //         fail("Could not delete test repository");
-    //     }
-    // }
-
-    @Before
-    public void init() {
-        this.remoteLocation = testRemote;
-        this.bound = new BranchBound(getPathOfRemote(), "master");
-        this.consistencyCheckInterval = 0;
+    GitInput input = new GitInput
+        .Builder(testRemote, "https://github.com/andiderp/dummy")
+        .addBranchToClone("feature")
+        .addBranchToClone("master2")
+        .build();
+    try {
+      GitHandler.cloneRepository(input);
+    } catch (Exception e) {
+      fail("Could not setup class");
     }
+  }
 
-    @Test
-    public void testDirectoryEmpty() throws Throwable {
-        build();
-        assertCorrectHead(masterHeadHash);
-    }
+  // @AfterClass
+  // public static void delteRepo() {
+  // try {
+  // FileCommands.delete(testRemote);
+  // } catch (IOException e) {
+  // fail("Could not delete test repository");
+  // }
+  // }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testDirectoryNotEmpty() throws Throwable {
-        File tempFile = new File(directory, "OK.txt");
-        FileCommands.createFile(tempFile);
-        build();
-    }
+  @Before
+  public void init() {
+    this.remoteLocation = testRemote;
+    this.bound = new BranchBound(getPathOfRemote(), "master");
+    this.consistencyCheckInterval = 0;
+  }
 
-    @Test
-    public void testCleanRebuildDoesNothing() throws Throwable {
-        build();
-        build();
-        assertCorrectHead(masterHeadHash);
-    }
+  @Test
+  public void testDirectoryEmpty() throws Throwable {
+    build();
+    assertCorrectHead(masterHeadHash);
+  }
 
-    @Test
-    public void testNeedToPull() throws Throwable {
-        build();
-        createCommitOnRemote();
-        String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD(getPathOfRemote(), "master");
-        build();
-        assertCorrectHead(newHEADHashOfRemote);
-        deleteTempCommitOnRemote();
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testDirectoryNotEmpty() throws Throwable {
+    File tempFile = new File(directory, "OK.txt");
+    FileCommands.createFile(tempFile);
+    build();
+  }
 
-    @Test
-    public void testDontCheckConsistencyToEarly() throws Throwable {
-        this.consistencyCheckInterval = (long) 10e6;
-        build();
-        createCommitOnRemote();
-        String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD(getPathOfRemote(), "master");
-        build();
-        assertCorrectHead(masterHeadHash);
-        deleteTempCommitOnRemote();
-    }
+  @Test
+  public void testCleanRebuildDoesNothing() throws Throwable {
+    build();
+    build();
+    assertCorrectHead(masterHeadHash);
+  }
 
-    @Test
-    public void testPullAfterCheckout() throws Throwable {
-        build();
-        createCommitOnRemote();
-        String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD(getPathOfRemote(), "master");
-        GitHandler.checkout(directory, "feature");
-        assertCorrectHead(featureHeadHash);
-        build();
-        assertCorrectHead(newHEADHashOfRemote);
-        deleteTempCommitOnRemote();
-    }
+  @Test
+  public void testNeedToPull() throws Throwable {
+    build();
+    createCommitOnRemote();
+    String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD(getPathOfRemote(), "master");
+    build();
+    assertCorrectHead(newHEADHashOfRemote);
+    deleteTempCommitOnRemote();
+  }
 
-    @Test
-    public void testBuildAfterCheckout() throws Throwable {
-        build();
-        GitHandler.checkout(directory, "feature");
-        assertCorrectHead(featureHeadHash);
-        build();
-        assertCorrectHead(masterHeadHash);
-    }
+  @Test
+  public void testDontCheckConsistencyToEarly() throws Throwable {
+    this.consistencyCheckInterval = (long) 10e6;
+    build();
+    createCommitOnRemote();
+    String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD(getPathOfRemote(), "master");
+    build();
+    assertCorrectHead(masterHeadHash);
+    deleteTempCommitOnRemote();
+  }
 
-    @Test(expected = GitException.class)
-    public void testRemoteNotAccessible() throws Throwable {
-        remoteLocation = new File("deadlink");
-        build();
-    }
+  @Test
+  public void testPullAfterCheckout() throws Throwable {
+    build();
+    createCommitOnRemote();
+    String newHEADHashOfRemote = GitHandler.getHashOfRemoteHEAD(getPathOfRemote(), "master");
+    GitHandler.checkout(directory, "feature");
+    assertCorrectHead(featureHeadHash);
+    build();
+    assertCorrectHead(newHEADHashOfRemote);
+    deleteTempCommitOnRemote();
+  }
 
-    @Test
-    public void testCommitBoundCurrentHEADAfterClone() throws Throwable {
-        this.bound = new CommitHashBound(masterHeadHash);
-        build();
-        assertCorrectHead(masterHeadHash);
-    }
+  @Test
+  public void testBuildAfterCheckout() throws Throwable {
+    build();
+    GitHandler.checkout(directory, "feature");
+    assertCorrectHead(featureHeadHash);
+    build();
+    assertCorrectHead(masterHeadHash);
+  }
 
-    @Test
-    public void testCommitBoundCurrentHEADAfterPull() throws Throwable {
-        this.bound = new CommitHashBound(masterHeadHash);
-        build();
-        build();
-        assertCorrectHead(masterHeadHash);
-    }
+  @Test(expected = GitException.class)
+  public void testRemoteNotAccessible() throws Throwable {
+    remoteLocation = new File("deadlink");
+    build();
+  }
 
-    @Test
-    public void testTagBoundCurrentHEADAfterClone() throws Throwable {
-        this.bound = new TagBound(getPathOfRemote(), "v0.1");
-        build();
-        assertCorrectHead(tagHash);
-    }
+  @Test
+  public void testCommitBoundCurrentHEADAfterClone() throws Throwable {
+    this.bound = new CommitHashBound(masterHeadHash);
+    build();
+    assertCorrectHead(masterHeadHash);
+  }
 
-    @Test
-    public void testTagBoundCurrentHEADAfterPull() throws Throwable {
-        this.bound = new TagBound(getPathOfRemote(), "v0.1");
-        build();
-        build();
-        assertCorrectHead(tagHash);
-    }
+  @Test
+  public void testCommitBoundCurrentHEADAfterPull() throws Throwable {
+    this.bound = new CommitHashBound(masterHeadHash);
+    build();
+    build();
+    assertCorrectHead(masterHeadHash);
+  }
 
-    @Test
-    public void testBranchBoundCurrentHEADAfterClone() throws Throwable {
-        this.bound = new BranchBound(getPathOfRemote(), "master2");
-        build();
-        assertCorrectHead(master2HeadHash);
-    }
+  @Test
+  public void testTagBoundCurrentHEADAfterClone() throws Throwable {
+    this.bound = new TagBound(getPathOfRemote(), "v0.1");
+    build();
+    assertCorrectHead(tagHash);
+  }
 
-    @Test
-    public void testBranchBoundCurrentHEADAfterPull() throws Throwable {
-        this.bound = new BranchBound(getPathOfRemote(), "master2");
-        build();
-        build();
-        assertCorrectHead(master2HeadHash);
-    }
+  @Test
+  public void testTagBoundCurrentHEADAfterPull() throws Throwable {
+    this.bound = new TagBound(getPathOfRemote(), "v0.1");
+    build();
+    build();
+    assertCorrectHead(tagHash);
+  }
 
-    @Test
-    public void testBuildAfterFailing() throws Throwable {
-        try {
-            build();
-            fail("The execution should fail because the repo does not exist");
-        } catch (Throwable e) {
-            // don't want the method to throw the exception
-        }
-        cloneRepo();
-        build();
-        assertCorrectHead(masterHeadHash);
-    }
+  @Test
+  public void testBranchBoundCurrentHEADAfterClone() throws Throwable {
+    this.bound = new BranchBound(getPathOfRemote(), "master2");
+    build();
+    assertCorrectHead(master2HeadHash);
+  }
 
-    private void build() throws Throwable {
-        GitInput.Builder inputBuilder =
-            new GitInput.Builder(directory, getPathOfRemote());
-        inputBuilder.addBranchToClone("master2");
-        inputBuilder.addBranchToClone("feature");
-        inputBuilder.setBound(this.bound);
-        inputBuilder.setConsistencyCheckInterval(this.consistencyCheckInterval);
-        GitInput input = inputBuilder.build();
-        BuildRequest<?, ?, ?, ?> buildRequest = new BuildRequest(GitRemoteSynchronizer.factory, input);
-        BuildManagers.build(buildRequest);
-    }
+  @Test
+  public void testBranchBoundCurrentHEADAfterPull() throws Throwable {
+    this.bound = new BranchBound(getPathOfRemote(), "master2");
+    build();
+    build();
+    assertCorrectHead(master2HeadHash);
+  }
 
-    private String getPathOfRemote() {
-        return "file://" + this.remoteLocation.getAbsolutePath();
+  @Test
+  public void testBuildAfterFailing() throws Throwable {
+    try {
+      build();
+      fail("The execution should fail because the repo does not exist");
+    } catch (Throwable e) {
+      // don't want the method to throw the exception
     }
+    cloneRepo();
+    build();
+    assertCorrectHead(masterHeadHash);
+  }
 
-    private void assertCorrectHead(String hash) {
-        try{
-            String commitHash = GitHandler.getHashOfHEAD(directory);
-            assertEquals(hash, commitHash);
-        } catch (Exception e) {
-            fail("Could not read hash of HEAD");
-        }
-    }
+  private void build() throws Throwable {
+    GitInput input = new GitInput
+        .Builder(directory, getPathOfRemote())
+        .addBranchToClone("master2")
+        .addBranchToClone("feature")
+        .setBound(this.bound)
+        .setConsistencyCheckInterval(this.consistencyCheckInterval)
+        .build();
+    BuildRequest<?, ?, ?, ?> buildRequest = new BuildRequest(GitRemoteSynchronizer.factory, input);
+    BuildManagers.build(buildRequest);
+  }
 
-    private void createCommitOnRemote() {
-        File newFile = new File(remoteLocation, "tempChange.txt");
-        try {
-            FileCommands.createFile(newFile);
-            FileCommands.writeToFile(newFile, "TEMP");
-            Git.open(remoteLocation).add().addFilepattern("tempChange.txt").call();
-            Git.open(remoteLocation).commit().setMessage("temp commit").call();
-        } catch (IOException e) {
-            fail("Could not open remote repository");
-        } catch (GitAPIException e) {
-            fail("Could not create temporary commit");
-        }
-    }
+  private String getPathOfRemote() {
+    return "file://" + this.remoteLocation.getAbsolutePath();
+  }
 
-    private void deleteTempCommitOnRemote() throws GitException {
-        GitHandler.resetRepoToCommit(remoteLocation, masterHeadHash);
+  private void assertCorrectHead(String hash) {
+    try {
+      String commitHash = GitHandler.getHashOfHEAD(directory);
+      assertEquals(hash, commitHash);
+    } catch (Exception e) {
+      fail("Could not read hash of HEAD");
     }
+  }
+
+  private void createCommitOnRemote() {
+    File newFile = new File(remoteLocation, "tempChange.txt");
+    try {
+      FileCommands.createFile(newFile);
+      FileCommands.writeToFile(newFile, "TEMP");
+      Git.open(remoteLocation).add().addFilepattern("tempChange.txt").call();
+      Git.open(remoteLocation).commit().setMessage("temp commit").call();
+    } catch (IOException e) {
+      fail("Could not open remote repository");
+    } catch (GitAPIException e) {
+      fail("Could not create temporary commit");
+    }
+  }
+
+  private void deleteTempCommitOnRemote() throws GitException {
+    GitHandler.resetRepoToCommit(remoteLocation, masterHeadHash);
+  }
 }
