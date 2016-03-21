@@ -1,13 +1,15 @@
 package build.pluto.buildgit.util;
 
-import org.junit.After;
-import org.junit.Test;
-import org.sugarj.common.FileCommands;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Test;
+import org.sugarj.common.FileCommands;
 
 public class FileUtilTest {
 

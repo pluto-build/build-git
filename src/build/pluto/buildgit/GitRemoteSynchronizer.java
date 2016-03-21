@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.List;
 
 import build.pluto.builder.Builder;
-import build.pluto.builder.BuilderFactory;
-import build.pluto.builder.BuilderFactoryFactory;
+import build.pluto.builder.factory.BuilderFactory;
+import build.pluto.builder.factory.BuilderFactoryFactory;
 import build.pluto.buildgit.dependency.GitRemoteRequirement;
 import build.pluto.buildgit.util.FileUtil;
 import build.pluto.buildgit.util.GitHandler;

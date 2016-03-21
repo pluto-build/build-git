@@ -1,13 +1,13 @@
 package build.pluto.buildgit;
 
-import build.pluto.buildgit.bound.BranchBound;
-import build.pluto.buildgit.bound.UpdateBound;
-import build.pluto.dependency.RemoteRequirement;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import build.pluto.buildgit.bound.BranchBound;
+import build.pluto.buildgit.bound.UpdateBound;
+import build.pluto.dependency.RemoteRequirement;
 
 public class GitInput implements Serializable {
     private static final long serialVersionUID = 1115081253158794260L;

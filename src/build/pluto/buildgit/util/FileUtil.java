@@ -1,8 +1,8 @@
 package build.pluto.buildgit.util;
 
-import org.sugarj.common.FileCommands;
-
 import java.io.File;
+
+import org.sugarj.common.FileCommands;
 
 public class FileUtil {
 
